@@ -356,7 +356,7 @@ public class ModelCountingRanking {
     static List<BigInteger> countModelsExact(Formula formula, int vars, int bound) throws IOException, InterruptedException {
 
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
-        counter.BOUND = bound;
+        Settings.MC_BOUND = bound;
 
         BigInteger models = counter.count(formula, vars);
         if (models == null)

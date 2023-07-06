@@ -417,7 +417,7 @@ public class PreciseModelCountingEvaluation {
     static List<BigInteger> countModelsExact(Formula original, Formula refined, int vars, int bound, int solver) throws IOException, InterruptedException {
 
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
-        counter.BOUND = bound;
+        Settings.MC_BOUND = bound;
         if (solver==1)
             counter.modelcounter = PreciseLTLModelCounter.MODEL_COUNTER.CACHET;
         else if (solver == 2)
@@ -429,7 +429,7 @@ public class PreciseModelCountingEvaluation {
 
 
         PreciseLTLModelCounter counter2 = new PreciseLTLModelCounter();
-        counter2.BOUND = bound;
+        Settings.MC_BOUND = bound;
         if (solver==1)
             counter2.modelcounter = PreciseLTLModelCounter.MODEL_COUNTER.CACHET;
         else if (solver == 2)
