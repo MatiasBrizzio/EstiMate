@@ -1,0 +1,28 @@
+INFO {
+  TITLE:       "TLSF - Test Specification"
+  DESCRIPTION: "Test Test Test"
+  SEMANTICS:   Mealy
+  TARGET:   Moore
+}
+
+MAIN {
+  INPUTS {
+    req;
+    cl;
+  }
+  OUTPUTS {
+    gr;
+    val;
+  }
+
+  ASSUMPTIONS {
+     G  F !req;
+  }
+
+  GUARANTEES {
+     G (req -> X (F gr));
+     G ((cl || gr) -> !gr);
+     G (cl -> !val);
+     G F (gr && val);
+  }
+}

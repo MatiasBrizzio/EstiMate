@@ -1,0 +1,27 @@
+INFO {
+  TITLE:       "TLSF - Test Specification"
+  DESCRIPTION: "Test Test Test"
+  SEMANTICS:   Mealy
+  TARGET:   Moore
+}
+
+MAIN {
+  INPUTS {
+    x;
+  }
+  OUTPUTS {
+    y;
+  }
+
+  ASSERT {
+     G (x || !y);
+  }
+
+  ASSUMPTIONS {
+     G  F !x;
+  }
+
+  GUARANTEES {
+     G  F y;
+  }
+}
