@@ -73,7 +73,7 @@ For chained binary expressions (without parentheses), the rightmost binary opera
 For example, `a -> b U c` is parsed as `a -> (b U c)`.
 
 
-### RUN ESTIMATE
+## RUN ESTIMATE
 The tool can take as input either a specification in TLSF format or directly an LTL formulae.  
 To run, you have to use the script `modelcount.sh`. 
 ```
