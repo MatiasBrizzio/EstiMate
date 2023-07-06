@@ -20,6 +20,8 @@ import java.util.*;
 public class ModelCountingRanking {
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
+        Formula form = null;
+        String formula = "";
         boolean automaton_counting = false;
         boolean re_counting = false;
         int bound = 0;
@@ -43,6 +45,10 @@ public class ModelCountingRanking {
             else if(args[i].startsWith("-re")){
                 re_counting = true;
             }
+            else if (args[i].startsWith("-formula=")){
+                formula = args[i].replace("-formula=","");
+                System.out.println(formula);
+            }
         	else {
         		filepath = args[i];
         	}
@@ -51,9 +57,14 @@ public class ModelCountingRanking {
 
         List<Formula> formulas = new LinkedList<>();
         
-        if (filepath == null) {
-        	 System.out.println("Use ./modelcounter.sh [-b=pathToFile] [-k=bound | -vars=a,b,c | -no-precise]");
+        if (filepath == null && formula.equals("")) {
+        	 System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
         	 return;
+        }
+        if (!formula.equals("")){
+            form = LtlParser.parse(formula,vars).formula();
+            System.out.println(countExhaustiveAutomataBasedPrefixes(form,vars,bound));
+            System.exit(0);
         }
         else if (filepath.endsWith(".tlsf")){
             Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
@@ -117,6 +128,8 @@ public class ModelCountingRanking {
 
         System.exit(0);
     }
+
+
 
     static void runPreciseMC(List<Formula> formulas, List<String> vars, int bound, String outname) throws IOException, InterruptedException {
         long initialTOTALTime = System.currentTimeMillis();
