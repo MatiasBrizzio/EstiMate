@@ -32,3 +32,55 @@ where N represents the number of states in A<sub>ϕ</sub>.
 Each element T<sub>ϕ</sub>[i,j] in the matrix denotes the number of transitions from state i to state j.
 
 By using matrix multiplication, the number of traces of length k accepted by A<sub>ϕ</sub> can be computed as I x T<sub>ϕ</sub><sup>k</sup> x F. Here, I is a row vector representing the initial states, T<sub>ϕ</sub><sup>k</sup> is the matrix resulting from multiplying T<sub>ϕ</sub> k times, and F is a column vector representing the final states of A<sub>ϕ</sub>.
+
+## <a name="LTL" /> Linear Temporal Logic (LTL)
+
+The grammar for LTL aims to support *Spot-style* LTL.
+For further details on temporal logic, e.g., semantics, see [here](https://spot.lrde.epita.fr/tl.pdf).
+
+The following constructs are supported:
+
+### Propositional Logic
+
+  * True: `tt`, `true`, `1`
+  * False: `ff`, `false`, `0`
+  * Atom: `[a-zA-Z_][a-zA-Z_0-9]*` or quoted `"[^"]+"`
+  * Negation: `!`, `NOT`
+  * Implication: `->`, `=>`, `IMP`
+  * Bi-implication: `<->`, `<=>`, `BIIMP`
+  * Exclusive Disjunction: `^`, `XOR`
+  * Conjunction: `&&`, `&`, `AND`
+  * Disjunction: `||`, `|`, `OR`
+  * Parenthesis: `(`, `)`
+
+###  Modal Logic
+
+  * Finally: `F`
+  * Globally: `G`
+  * Next: `X`
+  * (Strong) Until: `U`
+  * Weak Until: `W`
+  * (Weak) Release: `R`
+  * Strong Release: `M`
+
+### Precedence Rules
+
+The parser uses the following precedence:
+
+`OR` < `AND` < Binary Expressions < Unary Expressions < Literals, Constants, Parentheses
+
+For chained binary expressions (without parentheses), the rightmost binary operator takes precedence.
+For example, `a -> b U c` is parsed as `a -> (b U c)`.
+
+
+### RUN ESTIMATE
+The tool can take as input either a specification in TLSF format or directly an LTL formulae.  
+To run, you have to use the script `modelcount.sh`. 
+```
+./modelcount.sh case-studies/arbiter/arbiter.tlsf 
+```
+
+or:
+```
+./modelcount.sh -formula="(F (a && p))" -k=10 -auto -vars=a,p
+```
