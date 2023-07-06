@@ -1,0 +1,1 @@
+LTL=(F(G(b)) || G(F(a))),ALPHABET=[a, b]
