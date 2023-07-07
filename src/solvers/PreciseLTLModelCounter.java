@@ -181,14 +181,15 @@ public class PreciseLTLModelCounter {
         fw.close();
     }
 
-    private String cnfStr(Formula f) {
-        if (!(f instanceof Disjunction clause))
+    private String cnfStr (Formula f){
+        if (!(f instanceof Disjunction))
             throw new IllegalArgumentException("LTLModelCounter: formula is not in cnf format");
-		String cnf = "";
-        for (Formula c : clause.children()) {
+        Disjunction clause = (Disjunction) f;
+        String cnf = "";
+        for(Formula c : clause.children()){
             Literal l = (Literal) c;
-            if (l.isNegated()) cnf += "-";
-            cnf += l.getAtom() + 1;
+            if(l.isNegated()) cnf += "-";
+            cnf += l.getAtom()+1;
             cnf += " ";
         }
         cnf += "0";

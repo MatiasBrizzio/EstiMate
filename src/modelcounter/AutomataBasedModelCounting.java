@@ -8,11 +8,9 @@ import main.Settings;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import owl.ltl.LabelledFormula;
-
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class AutomataBasedModelCounting {
     private DMatrixRMaj T = null;

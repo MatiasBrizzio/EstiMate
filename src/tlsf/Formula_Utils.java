@@ -41,7 +41,8 @@ public class Formula_Utils {
 
     public static List<Formula> splitConjunction(Formula f) {
         List<Formula> conjuncts = new LinkedList<>();
-        if (f instanceof Conjunction conjunction) {
+        if (f instanceof Conjunction) {
+            Conjunction conjunction = (Conjunction) f;
             for (Formula c : conjunction.children)
                 if (c != BooleanConstant.TRUE)
                     conjuncts.addAll(splitConjunction(c));
