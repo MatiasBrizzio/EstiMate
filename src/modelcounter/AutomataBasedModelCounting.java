@@ -2,23 +2,17 @@ package modelcounter;
 
 import gov.nasa.ltl.graph.Edge;
 import gov.nasa.ltl.graph.Graph;
-import gov.nasa.ltl.graph.Guard;
 import gov.nasa.ltl.graph.Node;
 import gov.nasa.ltl.graphio.Writer;
+import main.Settings;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import owl.ltl.LabelledFormula;
-import solvers.SolverUtils;
-
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.*;
 
 public class AutomataBasedModelCounting {
-
-    public static int TIMEOUT = 300;
     private DMatrixRMaj T = null;
     private DMatrixRMaj I = null;
     private Graph<String> nba = null;
@@ -36,9 +30,6 @@ public class AutomataBasedModelCounting {
             //to sn+1 where λ is a new padding symbol that is not in the alphabet of A.
 
             Node<String> sn1 = new Node<>(nba);
-//			Guard<String> lambda = new Guard<>();
-//			lambda.add(new Literal<String>("0", false));
-
             for (Node<String> node : nba.getNodes()) {
                 if (node.getBooleanAttribute("accepting")) {
                     node.setBooleanAttribute("accepting", false);
@@ -47,51 +38,18 @@ public class AutomataBasedModelCounting {
                     sn1.getIncomingEdges().add(nToSn1);
                 }
             }
-
             sn1.setBooleanAttribute("accepting", true);
             Edge<String> sn1ToSn1 = new Edge<>(sn1, sn1);
             sn1.getOutgoingEdges().add(sn1ToSn1);
             sn1.getIncomingEdges().add(sn1ToSn1);
-
-//			w.write(nba);
         }
-
         //From A0 we construct the (n + 1) × (n + 1) transfer matrix T. A0 has n + 1
         //states s1, s2, . . . sn+1. The matrix entry Ti,j is the number of transitions from
         //state si to state sj
         T = buildTransferMatrix(nba);
-//		System.out.println("T: " + T.toString());
         int n = nba.getNodeCount();
         I = CommonOps_DDRM.identity(n);
 
-    }
-
-    /**
-     * Build a new matrix out of the given matrix A removing the given row and column.
-     *
-     * @param A
-     * @param row
-     * @param col
-     * @return
-     */
-    private static DMatrixRMaj removeRowAndCol(DMatrixRMaj A, int row, int col) {
-//		  System.out.println(A.toString());
-        DMatrixRMaj M = new DMatrixRMaj(A.numRows - 1, A.numCols - 1);
-        int k = -1;
-        for (int i = 0; i < A.numRows; i++) {
-            if (i != row) {
-                k++;
-                int r = -1;
-                for (int j = 0; j < A.numCols; j++) {
-                    if (j != col) {
-                        r++;
-                        M.set(k, r, A.get(i, j));
-                    }
-                }
-            }
-        }
-//		 System.out.println(M.toString());
-        return M;
     }
 
     /**
@@ -131,23 +89,20 @@ public class AutomataBasedModelCounting {
             DMatrixRMaj T_i = T.copy();
             DMatrixRMaj T_aux = T_res.copy();
             CommonOps_DDRM.mult(T_aux, T_i, T_res);
-//			System.out.println(i + ": " + T_res.toString());
             //check for timeout
             long currentTime = System.currentTimeMillis();
             long totalTime = currentTime - initialTime;
             int min = (int) (totalTime) / 60000;
             int sec = (int) (totalTime - min * 60000) / 1000;
-            if (sec > TIMEOUT) {
+            if (sec > Settings.MC_TIMEOUT) {
                 System.out.print("TO ");
                 return BigInteger.ZERO;
             }
         }
         DMatrixRMaj reachable = new DMatrixRMaj(1, n);
         CommonOps_DDRM.mult(u, T_res, reachable);
-//		System.out.println("reachable: " + reachable.toString());
         DMatrixRMaj result = new DMatrixRMaj(1, 1);
         CommonOps_DDRM.mult(reachable, v, result);
-//		System.out.println("result: " + result.toString());
         long value = (long) result.get(0, 0);
         BigInteger count = BigInteger.valueOf(value);
         return count;

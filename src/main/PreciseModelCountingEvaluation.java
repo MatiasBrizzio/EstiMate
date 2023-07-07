@@ -21,7 +21,17 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 
+/**
+ * The type Precise model counting evaluation.
+ */
 public class PreciseModelCountingEvaluation {
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         String formula = null;
         List<String> refinemets = new LinkedList<>();
@@ -143,6 +153,18 @@ public class PreciseModelCountingEvaluation {
 
     }
 
+    /**
+     * Run precise mc.
+     *
+     * @param original_formula the original formula
+     * @param refined_formulas the refined formulas
+     * @param vars             the vars
+     * @param bound            the bound
+     * @param solver           the solver
+     * @param outname          the outname
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static void runPreciseMC(Formula original_formula, List<Formula> refined_formulas, List<String> vars, int bound, int solver, String outname) throws IOException, InterruptedException {
         long initialTOTALTime = System.currentTimeMillis();
         int num_of_formulas = refined_formulas.size();
@@ -283,6 +305,18 @@ public class PreciseModelCountingEvaluation {
         }
     }
 
+    /**
+     * Run prefixes mc.
+     *
+     * @param automaton        the automaton
+     * @param original_formula the original formula
+     * @param refined_formulas the refined formulas
+     * @param vars             the vars
+     * @param bound            the bound
+     * @param outname          the outname
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static void runPrefixesMC(boolean automaton, Formula original_formula, List<Formula> refined_formulas, List<String> vars, int bound, String outname) throws IOException, InterruptedException {
         long initialTOTALTime = System.currentTimeMillis();
         int num_of_formulas = refined_formulas.size();
@@ -374,6 +408,18 @@ public class PreciseModelCountingEvaluation {
         }
     }
 
+    /**
+     * Count models list.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @param solver   the solver
+     * @return the list
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static List<BigInteger> countModels(Formula original, Formula refined, int vars, int bound, int solver) throws IOException, InterruptedException {
 //        List<BigInteger> lostModels = new LinkedList<>();
 //        for(int k = 1; k <= bound; k++) {
@@ -414,6 +460,18 @@ public class PreciseModelCountingEvaluation {
         return result;
     }
 
+    /**
+     * Count models exact list.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @param solver   the solver
+     * @return the list
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static List<BigInteger> countModelsExact(Formula original, Formula refined, int vars, int bound, int solver) throws IOException, InterruptedException {
 
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
@@ -447,6 +505,17 @@ public class PreciseModelCountingEvaluation {
         return result;
     }
 
+    /**
+     * Count prefixes list.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @return the list
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static List<BigInteger> countPrefixes(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
         List<BigInteger> lostModels = new LinkedList<>();
         for(int k = 1; k <= bound; k++) {
@@ -510,7 +579,15 @@ public class PreciseModelCountingEvaluation {
 
         return result;
     }
-    
+
+    /**
+     * Gets formula.
+     *
+     * @param formula1  the formula 1
+     * @param formula2  the formula 2
+     * @param variables the variables
+     * @return the formula
+     */
     static LabelledFormula getFormula(Formula formula1, Formula formula2, List<String> variables) {
     	LabelledFormula form = null;
 		if (formula2 == null)
@@ -521,6 +598,18 @@ public class PreciseModelCountingEvaluation {
 		}
 		return form;
     }
+
+    /**
+     * Count prefixes rltl list.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @return the list
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static List<BigInteger> countPrefixesRltl(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
         List<BigInteger> lostModels = new LinkedList<>();
 //        List<String> alphabet = genAlphabet(vars.size());
@@ -562,6 +651,17 @@ public class PreciseModelCountingEvaluation {
         return result;
     }
 
+    /**
+     * Count exhaustive prefixes rltl big integer.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @return the big integer
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static BigInteger countExhaustivePrefixesRltl(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
         Formula conj_lost = Conjunction.of(original, refined.not());
         LabelledFormula form_lost = LabelledFormula.of(conj_lost, vars);
@@ -575,6 +675,18 @@ public class PreciseModelCountingEvaluation {
         BigInteger result = lostModels.add(wonModels);
         return result;
     }
+
+    /**
+     * Count exhaustive automata based prefixes big integer.
+     *
+     * @param original the original
+     * @param refined  the refined
+     * @param vars     the vars
+     * @param bound    the bound
+     * @return the big integer
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
     static BigInteger countExhaustiveAutomataBasedPrefixes(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
 
         Formula conj_lost = Conjunction.of(original, refined.not());
@@ -589,49 +701,6 @@ public class PreciseModelCountingEvaluation {
         BigInteger result = lostModels.add(wonModels);
         return result;
     }
-
-    static List<BigInteger> countAutomataBasedPrefixes(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
-        List<BigInteger> lostModels = new LinkedList<>();
-        for(int k = 1; k <= bound; k++) {
-            Formula conj = Conjunction.of(original, refined.not());
-            LabelledFormula form = LabelledFormula.of(conj, vars);
-            AutomataBasedModelCounting counter = new AutomataBasedModelCounting(form,false);
-            BigInteger r = counter.count(k);
-            lostModels.add(r);
-        }
-
-        List<BigInteger> wonModels = new LinkedList<>();
-        for(int k = 1; k <= bound; k++) {
-            Formula conj = Conjunction.of(original.not(), refined);
-            LabelledFormula form = LabelledFormula.of(conj, vars);
-            AutomataBasedModelCounting counter = new AutomataBasedModelCounting(form,false);
-            BigInteger r = counter.count(k);
-            wonModels.add(r);
-        }
-        List<BigInteger> result = new LinkedList<>();
-        for(int i = 0; i < bound; i++) {
-            BigInteger pos = lostModels.get(i);
-            BigInteger neg = wonModels.get(i);
-            result.add(pos.add(neg));
-        }
-
-        return result;
-    }
-    
-    static List<String> genAlphabet(int n){
-    	List<String> alphabet = new LinkedList();
-		for (int i = 0; i < n; i++) {
-			String v = ""+Character.toChars(97+i)[0];
-			alphabet.add(v);
-		}
-		return alphabet;
-    }
-    static String toLambConvSyntax(Formula f, List<String> alphabet) {
-		String LTLFormula = LabelledFormula.of(f, alphabet).toString();
-		LTLFormula = LTLFormula.replaceAll("&", "&&");
-		LTLFormula = LTLFormula.replaceAll("\\|", "||");
-		return new String(LTLFormula); 
-	}
 
      private static void writeFile(String filename, List<BigInteger> result, String time) throws IOException {
         File file = new File(filename);
