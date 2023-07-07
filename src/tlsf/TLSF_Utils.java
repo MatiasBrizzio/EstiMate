@@ -7,21 +7,12 @@ import owl.ltl.spectra.Spectra;
 import owl.ltl.tlsf.Tlsf;
 import owl.ltl.tlsf.Tlsf.Semantics;
 import owl.ltl.visitors.SolverSyntaxOperatorReplacer;
+import solvers.SolverUtils;
 
 import java.io.*;
 import java.util.*;
 
 public class TLSF_Utils {
-    static Map<String, String> replacements = new HashMap<String, String>() {
-        private static final long serialVersionUID = 1L;
-
-        {
-            put("&", "&&");
-            put("|", "||");
-        }
-    };
-
-
     private static String getCommand() {
         String cmd = "";
         String currentOS = System.getProperty("os.name");
@@ -89,101 +80,6 @@ public class TLSF_Utils {
         return TlsfParser.parse(tlsf);
     }
 
-    public static String toTLSF(Tlsf spec) {
-        String tlsf_spec = "INFO {\n"
-                + "  TITLE:       " + spec.title() + "\n"
-                + "  DESCRIPTION: " + spec.description() + "\n";
-        if (spec.semantics().equals(Semantics.MEALY))
-            tlsf_spec += "  SEMANTICS:   Mealy\n";
-        else if (spec.semantics().equals(Semantics.MEALY_STRICT))
-            tlsf_spec += "  SEMANTICS:   Mealy,Strict\n";
-        else if (spec.semantics().equals(Semantics.MOORE))
-            tlsf_spec += "  SEMANTICS:   Moore\n";
-        else
-            tlsf_spec += "  SEMANTICS:   Moore,Strict\n";
-
-        if (spec.target().equals(Semantics.MEALY))
-            tlsf_spec += "  TARGET:   Mealy\n";
-        else if (spec.target().equals(Semantics.MEALY_STRICT))
-            tlsf_spec += "  TARGET:   Mealy,Strict\n";
-        else if (spec.target().equals(Semantics.MOORE))
-            tlsf_spec += "  TARGET:   Moore\n";
-        else
-            tlsf_spec += "  TARGET:   Moore,Strict\n";
-
-        tlsf_spec += "}\n"
-                + '\n'
-                + "MAIN {\n"
-                + "  INPUTS {\n"
-                + "    ";
-        int i = 0;
-        while (spec.inputs().get(i)) {
-            tlsf_spec += spec.variables().get(i) + ";";
-            i++;
-        }
-        tlsf_spec += "\n"
-                + "  }\n"
-                + "  OUTPUTS {\n"
-                + "    ";
-        while (spec.outputs().get(i)) {
-            tlsf_spec += spec.variables().get(i) + ";";
-            i++;
-        }
-        tlsf_spec += "\n"
-                + "  }\n"
-                + '\n';
-        if (spec.initially().compareTo(BooleanConstant.TRUE) != 0) {
-            tlsf_spec += "  INITIALLY {\n"
-                    + "    "
-                    + LabelledFormula.of(spec.initially().accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n"
-                    + "  }\n"
-                    + '\n';
-        }
-        if (spec.preset().compareTo(BooleanConstant.TRUE) != 0) {
-            tlsf_spec += "  PRESET {\n"
-                    + "    "
-                    + LabelledFormula.of(spec.preset().accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n"
-                    + "  }\n"
-                    + '\n';
-        }
-        if (spec.require().compareTo(BooleanConstant.TRUE) != 0) {
-            tlsf_spec += "  REQUIRE {\n"
-                    + "    "
-                    + LabelledFormula.of(spec.require().accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n"
-                    + "  }\n"
-                    + '\n';
-        }
-
-        if (!spec.assert_().isEmpty()) {
-            tlsf_spec += "  ASSERT {\n";
-            for (Formula f : spec.assert_()) {
-                tlsf_spec += "    " + LabelledFormula.of(f.accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n";
-            }
-            tlsf_spec += "  }\n"
-                    + '\n';
-        }
-
-        if (spec.assume().compareTo(BooleanConstant.TRUE) != 0) {
-            tlsf_spec += "  ASSUMPTIONS {\n"
-                    + "    "
-                    + LabelledFormula.of(spec.assume().accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n"
-                    + "  }\n"
-                    + '\n';
-        }
-
-        if (!spec.guarantee().isEmpty()) {
-            tlsf_spec += "  GUARANTEES {\n";
-
-            for (Formula f : spec.guarantee()) {
-                tlsf_spec += "    " + LabelledFormula.of(f.accept(new SolverSyntaxOperatorReplacer()), spec.variables()) + ";\n";
-            }
-            tlsf_spec += "  }\n";
-        }
-        tlsf_spec += '}';
-
-        return tlsf_spec;
-    }
-
     public static String adaptTLSFSpec(Tlsf spec) {
         String new_tlsf_spec = "INFO {\n"
                 + "  TITLE:       " + spec.title() + "\n"
@@ -231,7 +127,7 @@ public class TLSF_Utils {
         if (spec.initially().compareTo(BooleanConstant.TRUE) != 0) {
             new_tlsf_spec += "  INITIALLY {\n"
                     + "    "
-                    + toSolverSyntax((LabelledFormula.of(spec.initially(), spec.variables()))) + ";\n"
+                    + SolverUtils.toSolverSyntax((LabelledFormula.of(spec.initially(), spec.variables()))) + ";\n"
                     + "  }\n"
                     + '\n';
         }
@@ -239,14 +135,14 @@ public class TLSF_Utils {
         if (spec.preset().compareTo(BooleanConstant.TRUE) != 0) {
             new_tlsf_spec += "  PRESET {\n"
                     + "    "
-                    + toSolverSyntax((LabelledFormula.of(spec.preset(), spec.variables()))) + ";\n"
+                    + SolverUtils.toSolverSyntax((LabelledFormula.of(spec.preset(), spec.variables()))) + ";\n"
                     + "  }\n"
                     + '\n';
         }
         if (spec.require().compareTo(BooleanConstant.TRUE) != 0) {
             new_tlsf_spec += "  REQUIRE {\n"
                     + "    "
-                    + toSolverSyntax((LabelledFormula.of(spec.require(), spec.variables()))) + ";\n"
+                    + SolverUtils.toSolverSyntax((LabelledFormula.of(spec.require(), spec.variables()))) + ";\n"
                     + "  }\n"
                     + '\n';
         }
@@ -254,7 +150,7 @@ public class TLSF_Utils {
         if (!spec.assert_().isEmpty()) {
             new_tlsf_spec += "  ASSERT {\n";
             for (Formula f : spec.assert_()) {
-                new_tlsf_spec += "    " + toSolverSyntax((LabelledFormula.of(f, spec.variables()))) + ";\n";
+                new_tlsf_spec += "    " + SolverUtils.toSolverSyntax((LabelledFormula.of(f, spec.variables()))) + ";\n";
             }
             new_tlsf_spec += "  }\n"
                     + '\n';
@@ -263,7 +159,7 @@ public class TLSF_Utils {
         if (spec.assume().compareTo(BooleanConstant.TRUE) != 0) {
             new_tlsf_spec += "  ASSUMPTIONS {\n";
             for (Formula as : Formula_Utils.splitConjunction(spec.assume())) {
-                new_tlsf_spec += "    " + toSolverSyntax(LabelledFormula.of(as, spec.variables())) + ";\n";
+                new_tlsf_spec += "    " + SolverUtils.toSolverSyntax(LabelledFormula.of(as, spec.variables())) + ";\n";
             }
             new_tlsf_spec += "  }\n" + '\n';
         }
@@ -272,7 +168,7 @@ public class TLSF_Utils {
             new_tlsf_spec += "  GUARANTEES {\n";
 
             for (Formula f : spec.guarantee()) {
-                new_tlsf_spec += "    " + toSolverSyntax(((LabelledFormula.of(f, spec.variables())))) + ";\n";
+                new_tlsf_spec += "    " + SolverUtils.toSolverSyntax(((LabelledFormula.of(f, spec.variables())))) + ";\n";
             }
             new_tlsf_spec += "  }\n";
         }
@@ -282,24 +178,6 @@ public class TLSF_Utils {
             new_tlsf_spec = new_tlsf_spec.replaceAll(v, v.toLowerCase());
 
         return (new_tlsf_spec);
-    }
-
-    private static String toSolverSyntax(LabelledFormula f) {
-        String LTLFormula = f.toString();
-
-        for (String v : f.variables())
-            LTLFormula = LTLFormula.replaceAll(v, v.toLowerCase());
-
-        LTLFormula = LTLFormula.replaceAll("([A-Z])", " $1 ");
-
-        return replaceLTLConstructions(LTLFormula);
-    }
-
-    private static String replaceLTLConstructions(String line) {
-        Set<String> keys = replacements.keySet();
-        for (String key : keys)
-            line = line.replace(key, replacements.get(key));
-        return line;
     }
 
     public static Tlsf fromSpectra(Spectra spec) {
