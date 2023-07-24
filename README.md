@@ -6,7 +6,7 @@ It utilizes a transfer matrix, generated through a series of tree encodings, to 
 #### Acknowledgments
 If you utilize EstiMate for research purposes, 
 we kindly request that you cite the corresponding paper where the technique was introduced and evaluated: 
-[Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://arxiv.org/abs/2105.12595) 
+[Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://dl.acm.org/doi/10.1145/3583131.3590454) 
 Thank you :)
 
 ## Transfer Matrix Generation
