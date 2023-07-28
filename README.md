@@ -9,6 +9,26 @@ we kindly request that you cite the corresponding paper where the technique was 
 [Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://dl.acm.org/doi/10.1145/3583131.3590454) 
 Thank you :)
 
+
+```
+@inproceedings{10.1145/3583131.3590454,
+author = {Brizzio, Mat\'{\i}as and Cordy, Maxime and Papadakis, Mike and S\'{a}nchez, C\'{e}sar and Aguirre, Nazareno and Degiovanni, Renzo},
+title = {Automated Repair of Unrealisable LTL Specifications Guided by Model Counting},
+year = {2023},
+isbn = {9798400701191},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3583131.3590454},
+doi = {10.1145/3583131.3590454},
+booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
+pages = {1499–1507},
+numpages = {9},
+keywords = {search-based software engineering, LTL-synthesis, model counting},
+location = {Lisbon, Portugal},
+series = {GECCO '23}
+}
+```
+
 ## Transfer Matrix Generation
 
 The transfer matrix, denoted as T<sub>ϕ</sub>, is generated using the following steps:
