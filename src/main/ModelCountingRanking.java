@@ -118,7 +118,7 @@ public class ModelCountingRanking {
     static void runPreciseMC(List<Formula> formulas, List<String> vars, int bound, String outname) throws IOException, InterruptedException {
         long initialTOTALTime = System.currentTimeMillis();
         int num_of_formulas = formulas.size();
-        List<BigInteger>[] solutions = new List[num_of_formulas];
+        BigInteger[] solutions = new BigInteger[num_of_formulas];
         List<Integer> timeout_formulas = new LinkedList<>();
         int index = 0;
         System.out.println("Counting...");
@@ -126,9 +126,9 @@ public class ModelCountingRanking {
         for (Formula f : formulas) {
             long initialTime = System.currentTimeMillis();
             System.out.println(index + " Formula: " + LabelledFormula.of(f, vars));
-            List<BigInteger> result = countModelsExact(f, vars.size(), bound);
+            BigInteger result = countModelsExact(f, vars.size(), bound);
             if (result != null) {
-                System.out.println(result);
+                System.out.println("Result" + result);
                 long finalTime = System.currentTimeMillis();
                 long totalTime = finalTime - initialTime;
                 int min = (int) (totalTime) / 60000;
@@ -139,64 +139,103 @@ public class ModelCountingRanking {
                     String filename = outname.replace(".out", index + ".out");
                     writeFile(filename, result, time);
                 }
-                solutions[index] = result;
+                solutions[index] = (BigInteger) result;
             } else {
                 System.out.println("MC Timeout reached.");
                 timeout_formulas.add(index);
             }
             index++;
         }
-        System.out.println("Formula ranking for bounds 1..k");
-        SortedMap<BigInteger, List<Integer>>[] ranking = new TreeMap[bound];
-        for (int k = 0; k < bound; k++) {
-            List<BigInteger> k_values = new LinkedList<>();
-            for (int i = 0; i < num_of_formulas; i++) {
-                if (solutions[i] != null)
-                    k_values.add(solutions[i].get(k));
-                else
-                    k_values.add(null);
-            }
-
-            SortedMap<BigInteger, List<Integer>> order = new TreeMap<>();
-            for (int i = 0; i < num_of_formulas; i++) {
-                if (timeout_formulas.contains(i))
-                    continue;
-                BigInteger key = k_values.get(i);
-                List<Integer> value;
-                if (order.containsKey(key))
-                    value = order.get(key);
-                else
-                    value = new LinkedList<>();
-                value.add(i);
-                order.put(key, value);
-            }
-            ranking[k] = order;
-            System.out.println((k + 1) + " " + order.values());
-        }
-        if (outname != null)
-            writeRanking(outname, ranking);
+//        System.out.println("Formula ranking for bounds 1..k");
+//        SortedMap<BigInteger, List<Integer>>[] ranking = new TreeMap[bound];
+//        for (int k = 0; k < bound; k++) {
+//            List<BigInteger> k_values = new LinkedList<>();
+//            for (int i = 0; i < num_of_formulas; i++) {
+//                if (solutions[i] != null)
+//                    k_values.add(solutions[i].get(k));
+//                else
+//                    k_values.add(null);
+//            }
+//
+//            SortedMap<BigInteger, List<Integer>> order = new TreeMap<>();
+//            for (int i = 0; i < num_of_formulas; i++) {
+//                if (timeout_formulas.contains(i))
+//                    continue;
+//                BigInteger key = k_values.get(i);
+//                List<Integer> value;
+//                if (order.containsKey(key))
+//                    value = order.get(key);
+//                else
+//                    value = new LinkedList<>();
+//                value.add(i);
+//                order.put(key, value);
+//            }
+//            ranking[k] = order;
+//            System.out.println((k + 1) + " " + order.values());
+//        }
+//        if (outname != null)
+//            writeRanking(outname, ranking);
+//
+//        System.out.println("Global ranking...");
+//        List<BigInteger> totalNumOfModels = new LinkedList<>();
+//        String sumTotalNumOfModels = "";
+//        for (int i = 0; i < num_of_formulas; i++) {
+//            BigInteger f_result = BigInteger.ZERO;
+//            if (solutions[i] == null)
+//                f_result = null;
+//            else {
+//                for (BigInteger v : solutions[i])
+//                    f_result = f_result.add(v);
+//            }
+//            sumTotalNumOfModels += i + " " + f_result + "\n";
+//            totalNumOfModels.add(f_result);
+//        }
+//
+//        if (outname != null)
+//            writeRanking(outname.replace(".out", "-summary.out"), sumTotalNumOfModels, "");
+//
+//        SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
+//        for (int i = 0; i < num_of_formulas; i++) {
+//            BigInteger key = totalNumOfModels.get(i);
+//            if (key != null) {
+//                List<Integer> value;
+//                if (global_ranking.containsKey(key))
+//                    value = global_ranking.get(key);
+//                else
+//                    value = new LinkedList<>();
+//                value.add(i);
+//                global_ranking.put(key, value);
+//            }
+//        }
+//
+//        String global = "";
+//        String flatten_ranking_str = "";
+//        int[] formula_ranking = new int[num_of_formulas];
+//        int pos = 0;
+//        for (BigInteger key : global_ranking.keySet()) {
+//            global += global_ranking.get(key) + "\n";
+//            for (Integer f_pos : global_ranking.get(key)) {
+//                formula_ranking[f_pos] = pos;
+//                flatten_ranking_str += f_pos + "\n";
+//            }
+//            pos++;
+//        }
+//
+//        global += "\nRanking Levels: " + pos + "\n";
+//        if (!timeout_formulas.isEmpty()) {
+//            global += "\nTimeout Formulas: " + timeout_formulas;
+//        }
+//
+//        String formula_ranking_str = "";
+//        for (int i = 0; i < num_of_formulas; i++) {
+//            formula_ranking_str += formula_ranking[i] + "\n";
+//        }
+//        System.out.println(global);
 
         System.out.println("Global ranking...");
-        List<BigInteger> totalNumOfModels = new LinkedList<>();
-        String sumTotalNumOfModels = "";
-        for (int i = 0; i < num_of_formulas; i++) {
-            BigInteger f_result = BigInteger.ZERO;
-            if (solutions[i] == null)
-                f_result = null;
-            else {
-                for (BigInteger v : solutions[i])
-                    f_result = f_result.add(v);
-            }
-            sumTotalNumOfModels += i + " " + f_result + "\n";
-            totalNumOfModels.add(f_result);
-        }
-
-        if (outname != null)
-            writeRanking(outname.replace(".out", "-summary.out"), sumTotalNumOfModels, "");
-
         SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
         for (int i = 0; i < num_of_formulas; i++) {
-            BigInteger key = totalNumOfModels.get(i);
+            BigInteger key = (BigInteger) solutions[i];
             if (key != null) {
                 List<Integer> value;
                 if (global_ranking.containsKey(key))
@@ -222,15 +261,13 @@ public class ModelCountingRanking {
         }
 
         global += "\nRanking Levels: " + pos + "\n";
-        if (!timeout_formulas.isEmpty()) {
-            global += "\nTimeout Formulas: " + timeout_formulas;
-        }
-
         String formula_ranking_str = "";
         for (int i = 0; i < num_of_formulas; i++) {
             formula_ranking_str += formula_ranking[i] + "\n";
         }
+
         System.out.println(global);
+
 
         long finalTOTALTime = System.currentTimeMillis();
         long totalTime = finalTOTALTime - initialTOTALTime;
@@ -273,7 +310,7 @@ public class ModelCountingRanking {
             System.out.println(time);
             if (outname != null) {
                 String filename = outname.replace(".out", (re_counting ? "re-" : "auto-") + index + ".out");
-                writeFile(filename, List.of(result), time);
+                writeFile(filename, result, time);
             }
             solutions[index] = result;
             index++;
@@ -334,7 +371,7 @@ public class ModelCountingRanking {
     }
 
 
-    static List<BigInteger> countModelsExact(Formula formula, int vars, int bound) throws IOException, InterruptedException {
+    static BigInteger countModelsExact(Formula formula, int vars, int bound) throws IOException, InterruptedException {
 
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
         Settings.MC_BOUND = bound;
@@ -344,12 +381,12 @@ public class ModelCountingRanking {
             return null;
 
 
-        List<BigInteger> result = new LinkedList<>();
-        for (int i = 0; i < bound - 1; i++) {
-            result.add(BigInteger.ZERO);
-        }
-        result.add(models);
-        return result;
+//        List<BigInteger> result = new LinkedList<>();
+//        for (int i = 0; i < bound - 1; i++) {
+//            result.add(BigInteger.ZERO);
+//        }
+//        result.add(models);
+        return models;
     }
 
     static BigInteger countExhaustivePrefixesRltl(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
@@ -368,19 +405,19 @@ public class ModelCountingRanking {
         return result;
     }
 
-    private static void writeFile(String filename, List<BigInteger> result, String time) throws IOException {
+    private static void writeFile(String filename, BigInteger result, String time) throws IOException {
         File file = new File(filename);
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write("0 0\n");
-        for (int i = 0; i < result.size(); i++) {
-            BigInteger sol = result.get(i);
-            bw.write(String.valueOf(i + 1));
+//        for (int i = 0; i < result.size(); i++) {
+            BigInteger sol = result;
+//            bw.write(String.valueOf(i + 1));
             bw.write(" ");
             bw.write(sol.toString());
             bw.write("\n");
 //            System.out.println((i+1) + " " + sol);
-        }
+//        }
         bw.write(time + "\n");
         bw.flush();
         bw.close();

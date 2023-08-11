@@ -14,9 +14,9 @@ K=$1
 #  	done < "$FILE"
 
 RESULT_DIR="result"
-for I in {0..9}
+for I in {1..2}
 do
 	RESULT_DIR="MC/k$K/S$I/"
 	mkdir -p $RESULT_DIR
-	./modelcount.sh -vars=a,b,c -k=10 -auto -out="$RESULT_DIR/out.out" case-studies/modelcounting/S$I.form
+	./modelcount.sh -vars=a,b,c -k=3 -out="$RESULT_DIR/out.out" case-studies/modelcounting/S$I.form
 done
