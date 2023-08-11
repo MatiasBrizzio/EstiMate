@@ -38,7 +38,7 @@ public class ModelCountingRanking {
                 re_counting = true;
             } else if (args[i].startsWith("-formula=")) {
                 formula = args[i].replace("-formula=", "");
-                System.out.println(formula);
+//                System.out.println(formula);
             } else {
                 filepath = args[i];
             }
