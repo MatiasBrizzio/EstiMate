@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class ModelCountingRanking {
+    private BigInteger individual_result = BigInteger.ZERO;
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
         Formula form = null;
@@ -45,6 +46,9 @@ public class ModelCountingRanking {
         }
 
         List<Formula> formulas = new LinkedList<>();
+        String directoryName = "result";
+
+        String filename = "result/default.out";
 
         if (filepath == null && formula.equals("")) {
             System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
@@ -52,7 +56,19 @@ public class ModelCountingRanking {
         }
         if (!formula.equals("")) {
             form = LtlParser.parse(formula, vars).formula();
-            System.out.println(countExhaustiveAutomataBasedPrefixes(form, vars, bound));
+            BigInteger result;
+            if (automaton_counting || re_counting)
+                try {
+                    if (!re_counting)
+                        result = countExhaustiveAutomataBasedPrefixes(form, vars, bound);
+                    else
+                        result = countExhaustivePrefixesRltl(form, vars, bound);
+                    System.out.println(result);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            else
+                System.out.println(countModelsExact(form, vars.size(), bound));
             System.exit(0);
         } else if (filepath.endsWith(".tlsf")) {
             Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
@@ -90,8 +106,6 @@ public class ModelCountingRanking {
             reader.close();
         }
 
-        String directoryName = "result";
-        String filename = "result/default.out";
         if (outname != null) {
             if (outname.contains(".")) {
                 directoryName = outname.substring(0, outname.lastIndexOf('.'));
