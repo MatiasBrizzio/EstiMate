@@ -5,6 +5,10 @@
 result
 lib/ltl-model-counter/result/
 MC
+bin
+out
+.idea
+cnf.dimacs
 
 # Ignora todos los archivos de texto
 *.txt
