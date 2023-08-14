@@ -48,7 +48,7 @@ public class PreciseModelCountingEvaluationTest {
         List<BigInteger>[] solutions2 = new List [num_of_formulas];
         int index = 0;
         int bound = 5;
-        boolean prefixes = true;
+        boolean prefixes = false;
 
         System.out.println("Counting...");
         for(Formula ref : refined_formulas) {

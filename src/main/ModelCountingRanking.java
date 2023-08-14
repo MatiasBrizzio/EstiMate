@@ -160,91 +160,6 @@ public class ModelCountingRanking {
             }
             index++;
         }
-//        System.out.println("Formula ranking for bounds 1..k");
-//        SortedMap<BigInteger, List<Integer>>[] ranking = new TreeMap[bound];
-//        for (int k = 0; k < bound; k++) {
-//            List<BigInteger> k_values = new LinkedList<>();
-//            for (int i = 0; i < num_of_formulas; i++) {
-//                if (solutions[i] != null)
-//                    k_values.add(solutions[i].get(k));
-//                else
-//                    k_values.add(null);
-//            }
-//
-//            SortedMap<BigInteger, List<Integer>> order = new TreeMap<>();
-//            for (int i = 0; i < num_of_formulas; i++) {
-//                if (timeout_formulas.contains(i))
-//                    continue;
-//                BigInteger key = k_values.get(i);
-//                List<Integer> value;
-//                if (order.containsKey(key))
-//                    value = order.get(key);
-//                else
-//                    value = new LinkedList<>();
-//                value.add(i);
-//                order.put(key, value);
-//            }
-//            ranking[k] = order;
-//            System.out.println((k + 1) + " " + order.values());
-//        }
-//        if (outname != null)
-//            writeRanking(outname, ranking);
-//
-//        System.out.println("Global ranking...");
-//        List<BigInteger> totalNumOfModels = new LinkedList<>();
-//        String sumTotalNumOfModels = "";
-//        for (int i = 0; i < num_of_formulas; i++) {
-//            BigInteger f_result = BigInteger.ZERO;
-//            if (solutions[i] == null)
-//                f_result = null;
-//            else {
-//                for (BigInteger v : solutions[i])
-//                    f_result = f_result.add(v);
-//            }
-//            sumTotalNumOfModels += i + " " + f_result + "\n";
-//            totalNumOfModels.add(f_result);
-//        }
-//
-//        if (outname != null)
-//            writeRanking(outname.replace(".out", "-summary.out"), sumTotalNumOfModels, "");
-//
-//        SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
-//        for (int i = 0; i < num_of_formulas; i++) {
-//            BigInteger key = totalNumOfModels.get(i);
-//            if (key != null) {
-//                List<Integer> value;
-//                if (global_ranking.containsKey(key))
-//                    value = global_ranking.get(key);
-//                else
-//                    value = new LinkedList<>();
-//                value.add(i);
-//                global_ranking.put(key, value);
-//            }
-//        }
-//
-//        String global = "";
-//        String flatten_ranking_str = "";
-//        int[] formula_ranking = new int[num_of_formulas];
-//        int pos = 0;
-//        for (BigInteger key : global_ranking.keySet()) {
-//            global += global_ranking.get(key) + "\n";
-//            for (Integer f_pos : global_ranking.get(key)) {
-//                formula_ranking[f_pos] = pos;
-//                flatten_ranking_str += f_pos + "\n";
-//            }
-//            pos++;
-//        }
-//
-//        global += "\nRanking Levels: " + pos + "\n";
-//        if (!timeout_formulas.isEmpty()) {
-//            global += "\nTimeout Formulas: " + timeout_formulas;
-//        }
-//
-//        String formula_ranking_str = "";
-//        for (int i = 0; i < num_of_formulas; i++) {
-//            formula_ranking_str += formula_ranking[i] + "\n";
-//        }
-//        System.out.println(global);
 
         System.out.println("Global ranking...");
         SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
@@ -294,6 +209,8 @@ public class ModelCountingRanking {
             writeRanking(outname.replace(".out", "-global.out"), global, time);
             writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str, "");
             writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str, "");
+            String rank_as_number = outname.replace(".out", "rankingNumber.out");
+            writeRanking(rank_as_number, global_ranking);
         }
     }
 
@@ -381,6 +298,8 @@ public class ModelCountingRanking {
             writeRanking(ranking_formula_filename, formula_ranking_str, "");
             String ranking_filename = outname.replace(".out", (re_counting ? "re-" : "auto-") + "ranking.out");
             writeRanking(ranking_filename, flatten_ranking_str, "");
+            String rank_as_number = outname.replace(".out", (re_counting ? "re-" : "auto-") + "rankingNumber.out");
+            writeRanking(rank_as_number, global_ranking);
         }
     }
 
@@ -437,16 +356,15 @@ public class ModelCountingRanking {
         bw.close();
     }
 
-    private static void writeRanking(String filename, SortedMap<BigInteger, List<Integer>>[] ranking) throws IOException {
+    private static void writeRanking(String filename, SortedMap<BigInteger, List<Integer>> ranking) throws IOException {
         File file = new File(filename);
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
-
-        for (int i = 0; i < ranking.length; i++) {
-            for (BigInteger key : ranking[i].keySet())
-                bw.write(ranking[i].get(key).toString());
-            bw.write("\n");
-//            System.out.println((i+1) + " " + ranking[i].toString());
+        for (BigInteger key : ranking.keySet()){
+            for (Integer formulas : ranking.get(key)) {
+                bw.write(String.valueOf(key));
+                bw.write("\n");
+            }
         }
         bw.close();
     }
