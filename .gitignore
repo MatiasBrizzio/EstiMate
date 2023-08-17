@@ -1,9 +1,10 @@
 # Ignora archivos del sistema Mac 
 .DS_store
-
+test/.DS_Store
 # Ignora la carpeta node_modules
 result
 lib/ltl-model-counter/result/
+lib/ltl-model-counter/
 MC
 bin
 out
