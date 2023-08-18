@@ -6,6 +6,7 @@ import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.tlsf.Tlsf;
+import owl.run.modules.OutputWriters;
 import solvers.PreciseLTLModelCounter;
 import tlsf.TLSF_Utils;
 
@@ -28,6 +29,9 @@ public class ModelCountingRanking {
             if (args[i].startsWith("-k=")) {
                 String val = args[i].replace("-k=", "");
                 bound = Integer.parseInt(val);
+            }else if (args[i].startsWith("-to=")) {
+                String val = args[i].replace("-to=", "");
+                Settings.MC_TIMEOUT = Integer.parseInt(val);
             } else if (args[i].startsWith("-vars=")) {
                 Collections.addAll(vars, args[i].replace("-vars=", "").split(","));
             } else if (args[i].startsWith("-out=")) {
@@ -51,7 +55,7 @@ public class ModelCountingRanking {
         String filename = "result/default.out";
 
         if (filepath == null && formula.equals("")) {
-            System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
+            System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-to=timeout | -k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
             return;
         }
         if (!formula.equals("")) {
@@ -63,12 +67,21 @@ public class ModelCountingRanking {
                         result = countExhaustiveAutomataBasedPrefixes(form, vars, bound);
                     else
                         result = countExhaustivePrefixesRltl(form, vars, bound);
-                    System.out.println(result);
+                    if (result == null)
+                        System.out.println("timeout");
+                    else System.out.println(result);
                 } catch (Exception e) {
                     System.out.println(e);
                 }
-            else
-                System.out.println(countModelsExact(form, vars.size(), bound));
+            else{
+                result = countModelsExact(form, vars.size(), bound);
+                if ((result == null)) {
+                    System.out.println("timeout");
+                } else {
+                    System.out.println(result);
+                }
+            }
+                System.out.println();
             System.exit(0);
         } else if (filepath.endsWith(".tlsf")) {
             Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));

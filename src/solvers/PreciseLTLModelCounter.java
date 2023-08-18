@@ -20,7 +20,6 @@ public class PreciseLTLModelCounter {
     public int numOfTimeout = 0;
     public int numOfError = 0;
     public int numOfCalls = 0;
-    public int TIMEOUT = 180;
     public MODEL_COUNTER modelcounter = MODEL_COUNTER.RELSAT;
 
 	public String getCommandLTL2PL() {
@@ -72,7 +71,7 @@ public class PreciseLTLModelCounter {
         }
 
         boolean timeout = false;
-        if (!p.waitFor(TIMEOUT, TimeUnit.SECONDS)) {
+        if (!p.waitFor(Settings.MC_TIMEOUT, TimeUnit.SECONDS)) {
             timeout = true; //kill the process.
             p.destroy(); // consider using destroyForcibly instead
         }
@@ -150,7 +149,7 @@ public class PreciseLTLModelCounter {
         // run ltl2pl command
         String cmdltl2pl = getCommandLTL2PL();
         Process p = Runtime.getRuntime().exec(cmdltl2pl);
-        p.waitFor(TIMEOUT, TimeUnit.SECONDS);
+        p.waitFor(Settings.MC_TIMEOUT, TimeUnit.SECONDS);
 
         //read all CNF clauses
         List<String> vars = new LinkedList<>(); //BMC variables
