@@ -31,7 +31,7 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
     long transitions = 0;
     private FieldMatrix<BigFraction> T = null;
     private Automaton<S, EmersonLeiAcceptance> automaton = null;
-    private LabelledFormula formula = null;
+    private LabelledFormula formula;
     private Object[] states = null;
 
 

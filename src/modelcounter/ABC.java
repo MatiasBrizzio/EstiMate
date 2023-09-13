@@ -9,8 +9,8 @@ import java.util.LinkedList;
 
 public class ABC {
 
-    public DriverProxy abcDriver = null;
-    public boolean result = false;
+    public DriverProxy abcDriver;
+    public boolean result;
 
     public ABC() {
         result = false;
@@ -20,19 +20,19 @@ public class ABC {
     public BigInteger count(LinkedList<String> formulas, int bound, boolean exhaustive, boolean positive) {
         abcDriver.setOption(Option.REGEX_FLAG, Option.REGEX_FLAG_ANYSTRING);
 
-        String constraint = "(set-logic QF_S)\n"
-                + "(declare-fun x () String)\n";
+        StringBuilder constraint = new StringBuilder("(set-logic QF_S)\n"
+                + "(declare-fun x () String)\n");
 
         for (String f : formulas) {
             if (positive)
-                constraint += "(assert (in x /" + f + "/))\n";
+                constraint.append("(assert (in x /").append(f).append("/))\n");
             else
-                constraint += "(assert (not (in x /" + f + "/)))\n";
+                constraint.append("(assert (not (in x /").append(f).append("/)))\n");
 
         }
-        constraint += "(assert (= (len x) " + bound + "))\n";
-        constraint += "(check-sat)\n";
-        result = abcDriver.isSatisfiable(constraint);
+        constraint.append("(assert (= (len x) ").append(bound).append("))\n");
+        constraint.append("(check-sat)\n");
+        result = abcDriver.isSatisfiable(constraint.toString());
         BigInteger count = BigInteger.ZERO;
 
         if (result) {
@@ -47,7 +47,7 @@ public class ABC {
             }
             abcDriver.dispose(); // release resources
         }
-            return count;
+        return count;
     }
 }
 

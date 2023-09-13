@@ -12,7 +12,7 @@ public class LTLSolver {
     public static int numOfCalls = 0;
 
     private static String getCommand() {
-        String cmd = "";
+        String cmd;
         String currentOS = System.getProperty("os.name");
         if (currentOS.startsWith("Mac"))
             cmd = "./lib/aalta";
@@ -31,12 +31,13 @@ public class LTLSolver {
         }
 
         boolean timeout = false;
+        assert p != null;
         if (!p.waitFor(Settings.SAT_TIMEOUT, TimeUnit.SECONDS)) {
             timeout = true; //kill the process.
             p.destroy(); // consider using destroyForcibly instead
         }
 
-        SolverResult sat = SolverResult.ERROR;
+        SolverResult sat;
         String aux;
         if (timeout) {
             numOfTimeout++;
@@ -82,10 +83,8 @@ public class LTLSolver {
             err.close();
         }
 
-        if (p != null) {
-            OutputStream os = p.getOutputStream();
-            if (os != null) os.close();
-        }
+        OutputStream os = p.getOutputStream();
+        if (os != null) os.close();
         return sat;
     }
 

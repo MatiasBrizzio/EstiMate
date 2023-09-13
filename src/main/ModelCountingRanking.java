@@ -6,7 +6,6 @@ import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.tlsf.Tlsf;
-import owl.run.modules.OutputWriters;
 import solvers.PreciseLTLModelCounter;
 import tlsf.TLSF_Utils;
 
@@ -16,9 +15,10 @@ import java.util.*;
 
 public class ModelCountingRanking {
     private BigInteger individual_result = BigInteger.ZERO;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
-        Formula form = null;
+        Formula form;
         String formula = "";
         boolean automaton_counting = false;
         boolean re_counting = false;
@@ -29,7 +29,7 @@ public class ModelCountingRanking {
             if (args[i].startsWith("-k=")) {
                 String val = args[i].replace("-k=", "");
                 bound = Integer.parseInt(val);
-            }else if (args[i].startsWith("-to=")) {
+            } else if (args[i].startsWith("-to=")) {
                 String val = args[i].replace("-to=", "");
                 Settings.MC_TIMEOUT = Integer.parseInt(val);
             } else if (args[i].startsWith("-vars=")) {
@@ -73,7 +73,7 @@ public class ModelCountingRanking {
                 } catch (Exception e) {
                     System.out.println(e);
                 }
-            else{
+            else {
                 result = countModelsExact(form, vars.size(), bound);
                 if ((result == null)) {
                     System.out.println("timeout");
@@ -81,7 +81,7 @@ public class ModelCountingRanking {
                     System.out.println(result);
                 }
             }
-                System.out.println();
+            System.out.println();
             System.exit(0);
         } else if (filepath.endsWith(".tlsf")) {
             Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
@@ -189,23 +189,23 @@ public class ModelCountingRanking {
             }
         }
 
-        String global = "";
-        String flatten_ranking_str = "";
+        StringBuilder global = new StringBuilder();
+        StringBuilder flatten_ranking_str = new StringBuilder();
         int[] formula_ranking = new int[num_of_formulas];
         int pos = 0;
         for (BigInteger key : global_ranking.keySet()) {
-            global += global_ranking.get(key) + "\n";
+            global.append(global_ranking.get(key)).append("\n");
             for (Integer f_pos : global_ranking.get(key)) {
                 formula_ranking[f_pos] = pos;
-                flatten_ranking_str += f_pos + "\n";
+                flatten_ranking_str.append(f_pos).append("\n");
             }
             pos++;
         }
 
-        global += "\nRanking Levels: " + pos + "\n";
-        String formula_ranking_str = "";
+        global.append("\nRanking Levels: ").append(pos).append("\n");
+        StringBuilder formula_ranking_str = new StringBuilder();
         for (int i = 0; i < num_of_formulas; i++) {
-            formula_ranking_str += formula_ranking[i] + "\n";
+            formula_ranking_str.append(formula_ranking[i]).append("\n");
         }
 
         System.out.println(global);
@@ -219,9 +219,9 @@ public class ModelCountingRanking {
         System.out.println(time);
 
         if (outname != null) {
-            writeRanking(outname.replace(".out", "-global.out"), global, time);
-            writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str, "");
-            writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str, "");
+            writeRanking(outname.replace(".out", "-global.out"), global.toString(), time);
+            writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str.toString(), "");
+            writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str.toString(), "");
             String rank_as_number = outname.replace(".out", "rankingNumber.out");
             writeRanking(rank_as_number, global_ranking);
         }
@@ -276,23 +276,23 @@ public class ModelCountingRanking {
             }
         }
 
-        String global = "";
-        String flatten_ranking_str = "";
+        StringBuilder global = new StringBuilder();
+        StringBuilder flatten_ranking_str = new StringBuilder();
         int[] formula_ranking = new int[num_of_formulas];
         int pos = 0;
         for (BigInteger key : global_ranking.keySet()) {
-            global += global_ranking.get(key) + "\n";
+            global.append(global_ranking.get(key)).append("\n");
             for (Integer f_pos : global_ranking.get(key)) {
                 formula_ranking[f_pos] = pos;
-                flatten_ranking_str += f_pos + "\n";
+                flatten_ranking_str.append(f_pos).append("\n");
             }
             pos++;
         }
 
-        global += "\nRanking Levels: " + pos + "\n";
-        String formula_ranking_str = "";
+        global.append("\nRanking Levels: ").append(pos).append("\n");
+        StringBuilder formula_ranking_str = new StringBuilder();
         for (int i = 0; i < num_of_formulas; i++) {
-            formula_ranking_str += formula_ranking[i] + "\n";
+            formula_ranking_str.append(formula_ranking[i]).append("\n");
         }
 
         System.out.println(global);
@@ -306,11 +306,11 @@ public class ModelCountingRanking {
 
         if (outname != null) {
             String filename = outname.replace(".out", (re_counting ? "re-" : "auto-") + "global.out");
-            writeRanking(filename, global, time);
+            writeRanking(filename, global.toString(), time);
             String ranking_formula_filename = outname.replace(".out", (re_counting ? "re-" : "auto-") + "ranking-by-formula.out");
-            writeRanking(ranking_formula_filename, formula_ranking_str, "");
+            writeRanking(ranking_formula_filename, formula_ranking_str.toString(), "");
             String ranking_filename = outname.replace(".out", (re_counting ? "re-" : "auto-") + "ranking.out");
-            writeRanking(ranking_filename, flatten_ranking_str, "");
+            writeRanking(ranking_filename, flatten_ranking_str.toString(), "");
             String rank_as_number = outname.replace(".out", (re_counting ? "re-" : "auto-") + "rankingNumber.out");
             writeRanking(rank_as_number, global_ranking);
         }
@@ -357,11 +357,11 @@ public class ModelCountingRanking {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write("0 0\n");
 //        for (int i = 0; i < result.size(); i++) {
-            BigInteger sol = result;
+        BigInteger sol = result;
 //            bw.write(String.valueOf(i + 1));
-            bw.write(" ");
-            bw.write(sol.toString());
-            bw.write("\n");
+        bw.write(" ");
+        bw.write(sol.toString());
+        bw.write("\n");
 //            System.out.println((i+1) + " " + sol);
 //        }
         bw.write(time + "\n");
@@ -373,7 +373,7 @@ public class ModelCountingRanking {
         File file = new File(filename);
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
-        for (BigInteger key : ranking.keySet()){
+        for (BigInteger key : ranking.keySet()) {
             for (Integer formulas : ranking.get(key)) {
                 bw.write(String.valueOf(key));
                 bw.write("\n");

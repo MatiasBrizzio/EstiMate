@@ -11,7 +11,7 @@ import java.util.List;
 
 
 public class Count {
-    Rltlconv_LTLModelCounter translatorLTLtoRE = null;
+    Rltlconv_LTLModelCounter translatorLTLtoRE;
 
     public Count() {
         translatorLTLtoRE = new Rltlconv_LTLModelCounter();
@@ -22,7 +22,7 @@ public class Count {
         String[] arr = Discretizer.or(abcRE);
         BigInteger result = BigInteger.ZERO;
         for (int i = 0; i < arr.length; i++) {
-            BigInteger count = BigInteger.ZERO;
+            BigInteger count;
             LinkedList<String> abcStrs = new LinkedList<>();
             String s = translatorLTLtoRE.toABClanguage(arr[i]);
             abcStrs.add(s);
@@ -48,7 +48,7 @@ public class Count {
         String alph = alphabet.toString();
 
         String form = "LTL=" + ltl;
-        if (alph != null && alph != "")
+        if (alph != null && !alph.equals(""))
             form += ",ALPHABET=" + alph;
         if (alph != null && formula.variables().size() > 5 && formula.variables().size() < 12)
             translatorLTLtoRE.encoded_alphabet = 0;

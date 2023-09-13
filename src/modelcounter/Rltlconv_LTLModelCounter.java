@@ -26,14 +26,12 @@ import java.util.concurrent.TimeUnit;
 public class Rltlconv_LTLModelCounter {
     //Map labels to ids
     public java.util.Map<String, String> labelIDs;
-    public int encoded_alphabet = -1;
+    public int encoded_alphabet;
     public int[] state = {48, 48};//start with char 0
-    int base = 48;//start with char 0
+    int base;
 
     public Rltlconv_LTLModelCounter() {
-        base = 48;
         labelIDs = new HashMap<>();
-        encoded_alphabet = -1;
     }
 
     public void generateLabels(Nba nba) {
@@ -78,17 +76,17 @@ public class Rltlconv_LTLModelCounter {
         InputStreamReader inread = new InputStreamReader(in);
         BufferedReader bufferedreader = new BufferedReader(inread);
         String aux;
-        String out = "";
+        StringBuilder out = new StringBuilder();
         while ((aux = bufferedreader.readLine()) != null) {
-            out += aux + "\n";
+            out.append(aux).append("\n");
         }
         // Close the InputStream
         bufferedreader.close();
         inread.close();
         in.close();
 
-        if (out != "")
-            writeFile("rltlconv-out.txt", out);
+        if (!out.toString().equals(""))
+            writeFile("rltlconv-out.txt", out.toString());
 
         // Leer el error del programa.
         InputStream err = p.getErrorStream();
@@ -108,11 +106,9 @@ public class Rltlconv_LTLModelCounter {
             throw new RuntimeException("ERROR in RltlConv translation.");
         }
 
-        if (p != null) {
-            OutputStream os = p.getOutputStream();
-            if (os != null) os.close();
-            p.destroy();
-        }
+        OutputStream os = p.getOutputStream();
+        if (os != null) os.close();
+        p.destroy();
     }
 
     public Nba ltl2nba(String formula) throws IOException, InterruptedException {
@@ -214,7 +210,7 @@ public class Rltlconv_LTLModelCounter {
     }
 
     public String toABClanguage(String re) {
-        String abcStr = "";
+        String abcStr;
         abcStr = re.replace("λ", "\"\"");
         abcStr = abcStr.replace("+", "|");
         return abcStr;

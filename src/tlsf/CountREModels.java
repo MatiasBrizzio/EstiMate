@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public class CountREModels {
-    FormulaToRE translatorLTLtoRE = null;
+    FormulaToRE translatorLTLtoRE;
 
     public CountREModels() {
         translatorLTLtoRE = new FormulaToRE();
@@ -24,7 +24,7 @@ public class CountREModels {
             if (abcStr != null)
                 abcStrs.add(abcStr);
         }
-        BigInteger count = BigInteger.ZERO;
+        BigInteger count;
         if (translatorLTLtoRE.encoded_alphabet == 0)
             count = abc.count(abcStrs, bound * 2, exhaustive, positive);//each state is characterised by 2 characters
         else if (translatorLTLtoRE.encoded_alphabet == 1)
@@ -46,11 +46,6 @@ public class CountREModels {
             translatorLTLtoRE.encoded_alphabet = 0;
         else if (vars >= 12)
             translatorLTLtoRE.encoded_alphabet = 1;
-//		System.out.println("Translating from LTL to NBA...");
-//		System.out.println(LTLModelCounter.encoded_alphabet);
-//		System.out.println("NBA: " + nba.states().size() +  "(" + nba.accepting().size() + ") " + nba.transitions().size()); 
-//		Nfa dfa = nba.toDeterministicNfa();
-//		System.out.println("Generating RE...");
         translatorLTLtoRE.generateLabels(ltl.variables());
         String s = translatorLTLtoRE.formulaToRegularExpression(ltl);
         if (s == null)
@@ -59,7 +54,7 @@ public class CountREModels {
     }
 
     public String toABClanguage(String re) {
-        String abcStr = "";
+        String abcStr;
         abcStr = re.replace("λ", "\"\"");
         abcStr = abcStr.replace("+", "|");
         return abcStr;

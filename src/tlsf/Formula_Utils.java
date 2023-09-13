@@ -14,8 +14,7 @@ public class Formula_Utils {
 
         for (Formula c : f.formula().children()) {
             LabelledFormula sf = LabelledFormula.of(c, f.variables());
-            for (LabelledFormula e : subformulas(sf))
-                s.add(e);
+            s.addAll(subformulas(sf));
         }
         s.add(LabelledFormula.of(f.formula(), f.variables()));
         return s;
@@ -25,8 +24,7 @@ public class Formula_Utils {
         Set<Formula> s = new HashSet<>();
 
         for (Formula c : f.children()) {
-            for (Formula e : subformulas(c))
-                s.add(e);
+            s.addAll(subformulas(c));
         }
         s.add(f);
         return s;

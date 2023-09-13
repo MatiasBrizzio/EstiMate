@@ -8,15 +8,17 @@ import main.Settings;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import owl.ltl.LabelledFormula;
+
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AutomataBasedModelCounting {
-    private DMatrixRMaj T = null;
-    private DMatrixRMaj I = null;
-    private Graph<String> nba = null;
-    private boolean exhaustive = true;
+    private DMatrixRMaj T;
+    private DMatrixRMaj I;
+    private Graph<String> nba;
+    private boolean exhaustive;
 
     public AutomataBasedModelCounting(LabelledFormula formula, boolean exhaustive) throws IOException, InterruptedException {
 

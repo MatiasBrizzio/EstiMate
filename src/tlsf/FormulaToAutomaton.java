@@ -36,14 +36,13 @@ public class FormulaToAutomaton<S> {
 
     //Map labels to ids
     public Map<String, String> labelIDs = new HashMap<>();
-    public int encoded_alphabet = -1;
+    public int encoded_alphabet;
     public int[] state = {48, 48};//start with char 0
-    public int alphabetSize = 0;
-    int base = 48;//start with char 0
+    public int alphabetSize;
+    int base;
     private Object2IntMap stateNumbers;
 
     public FormulaToAutomaton() {
-        base = 48;
         labelIDs.clear();
         encoded_alphabet = -1;
         alphabetSize = 0;

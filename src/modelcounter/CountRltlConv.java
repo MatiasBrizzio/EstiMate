@@ -22,7 +22,7 @@ public class CountRltlConv {
         String ltl = SolverUtils.toLambConvSyntax(label_formula.toString());
         String alph = alphabet.toString();
         String form = "LTL=" + ltl;
-        if (alph != null && alph != "")
+        if (alph != null && !alph.equals(""))
             form += ",ALPHABET=" + alph;
         return form;
     }
@@ -42,7 +42,7 @@ public class CountRltlConv {
         InputStream in = p.getInputStream();
         InputStreamReader inread = new InputStreamReader(in);
         BufferedReader bufferedreader = new BufferedReader(inread);
-        String aux = "";
+        String aux;
         String out = "";
         while ((aux = bufferedreader.readLine()) != null) {
             out = aux;
@@ -52,11 +52,9 @@ public class CountRltlConv {
         inread.close();
         in.close();
 
-        if (p != null) {
-            OutputStream os = p.getOutputStream();
-            if (os != null) os.close();
-            p.destroy();
-        }
+        OutputStream os = p.getOutputStream();
+        if (os != null) os.close();
+        p.destroy();
         BigInteger result = new BigInteger(out);
         return result;
     }

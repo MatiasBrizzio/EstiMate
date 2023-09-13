@@ -71,7 +71,7 @@ public class PreciseModelCountingEvaluation {
         if (benchmarkusage && filepath == null) {
             System.out.println("Use ./modelcounter.sh [-b=pathToFile] [-k=bound | -vars=a,b,c | -no-precise]");
             return;
-        } else if (benchmarkusage && filepath != null) {
+        } else if (benchmarkusage) {
 
             BufferedReader reader;
             reader = new BufferedReader(new FileReader(filepath));
@@ -207,7 +207,7 @@ public class PreciseModelCountingEvaluation {
 
         System.out.println("Global ranking...");
         List<BigInteger> totalNumOfModels = new LinkedList<>();
-        String sumTotalNumOfModels = "";
+        StringBuilder sumTotalNumOfModels = new StringBuilder();
         for (int i = 0; i < num_of_formulas; i++) {
             BigInteger f_result = BigInteger.ZERO;
             if (solutions[i] == null)
@@ -216,12 +216,12 @@ public class PreciseModelCountingEvaluation {
                 for (BigInteger v : solutions[i])
                     f_result = f_result.add(v);
             }
-            sumTotalNumOfModels += i + " " + f_result + "\n";
+            sumTotalNumOfModels.append(i).append(" ").append(f_result).append("\n");
             totalNumOfModels.add(f_result);
         }
 
         if (outname != null)
-            writeRanking(outname.replace(".out", "-summary.out"), sumTotalNumOfModels, "");
+            writeRanking(outname.replace(".out", "-summary.out"), sumTotalNumOfModels.toString(), "");
 
         SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
         for (int i = 0; i < num_of_formulas; i++) {
@@ -237,13 +237,13 @@ public class PreciseModelCountingEvaluation {
             }
         }
 
-        String global = "";
-        String flatten_ranking_str = "";
+        StringBuilder global = new StringBuilder();
+        StringBuilder flatten_ranking_str = new StringBuilder();
         int[] formula_ranking = new int[num_of_formulas];
 //        int i = 0;
         int pos = 0;
         for (BigInteger key : global_ranking.keySet()) {
-            global += global_ranking.get(key) + "\n";
+            global.append(global_ranking.get(key)).append("\n");
 //            i += global_ranking.get(key).size();
 //            if (i < num_of_formulas-1)
 //                global +=", ";
@@ -252,19 +252,19 @@ public class PreciseModelCountingEvaluation {
             for (Integer f_pos : global_ranking.get(key)) {
                 //int f_pos = refined_formulas.indexOf(f);
                 formula_ranking[f_pos] = pos;
-                flatten_ranking_str += f_pos + "\n";
+                flatten_ranking_str.append(f_pos).append("\n");
             }
             pos++;
         }
 
-        global += "\nRanking Levels: " + pos + "\n";
+        global.append("\nRanking Levels: ").append(pos).append("\n");
         if (!timeout_formulas.isEmpty()) {
-            global += "\nTimeout Formulas: " + timeout_formulas;
+            global.append("\nTimeout Formulas: ").append(timeout_formulas);
         }
 
-        String formula_ranking_str = "";
+        StringBuilder formula_ranking_str = new StringBuilder();
         for (int i = 0; i < num_of_formulas; i++) {
-            formula_ranking_str += formula_ranking[i] + "\n";
+            formula_ranking_str.append(formula_ranking[i]).append("\n");
         }
         System.out.println(global);
 
@@ -276,9 +276,9 @@ public class PreciseModelCountingEvaluation {
         System.out.println(time);
 
         if (outname != null) {
-            writeRanking(outname.replace(".out", "-global.out"), global, time);
-            writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str, "");
-            writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str, "");
+            writeRanking(outname.replace(".out", "-global.out"), global.toString(), time);
+            writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str.toString(), "");
+            writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str.toString(), "");
         }
     }
 
@@ -339,13 +339,13 @@ public class PreciseModelCountingEvaluation {
             }
         }
 
-        String global = "";
-        String flatten_ranking_str = "";
+        StringBuilder global = new StringBuilder();
+        StringBuilder flatten_ranking_str = new StringBuilder();
         int[] formula_ranking = new int[num_of_formulas];
 //        int i = 0;
         int pos = 0;
         for (BigInteger key : global_ranking.keySet()) {
-            global += global_ranking.get(key) + "\n";
+            global.append(global_ranking.get(key)).append("\n");
 //            i += global_ranking.get(key).size();
 //            if (i < num_of_formulas-1)
 //                global +=", ";
@@ -355,15 +355,15 @@ public class PreciseModelCountingEvaluation {
             for (Integer f_pos : global_ranking.get(key)) {
                 //int f_pos = refined_formulas.indexOf(f);
                 formula_ranking[f_pos] = pos;
-                flatten_ranking_str += f_pos + "\n";
+                flatten_ranking_str.append(f_pos).append("\n");
             }
             pos++;
         }
 
-        global += "\nRanking Levels: " + pos + "\n";
-        String formula_ranking_str = "";
+        global.append("\nRanking Levels: ").append(pos).append("\n");
+        StringBuilder formula_ranking_str = new StringBuilder();
         for (int i = 0; i < num_of_formulas; i++) {
-            formula_ranking_str += formula_ranking[i] + "\n";
+            formula_ranking_str.append(formula_ranking[i]).append("\n");
         }
 
         System.out.println(global);
@@ -377,11 +377,11 @@ public class PreciseModelCountingEvaluation {
 
         if (outname != null) {
             String filename = automaton ? outname.replace(".out", "auto-global.out") : outname.replace(".out", "re-global.out");
-            writeRanking(filename, global, time);
+            writeRanking(filename, global.toString(), time);
             String ranking_formula_filename = automaton ? outname.replace(".out", "auto-ranking-by-formula.out") : outname.replace(".out", "re-ranking-by-formula.out");
-            writeRanking(ranking_formula_filename, formula_ranking_str, "");
+            writeRanking(ranking_formula_filename, formula_ranking_str.toString(), "");
             String ranking_filename = automaton ? outname.replace(".out", "auto-ranking.out") : outname.replace(".out", "re-ranking.out");
-            writeRanking(ranking_filename, flatten_ranking_str, "");
+            writeRanking(ranking_filename, flatten_ranking_str.toString(), "");
         }
     }
 
@@ -566,7 +566,7 @@ public class PreciseModelCountingEvaluation {
      * @return the formula
      */
     static LabelledFormula getFormula(Formula formula1, Formula formula2, List<String> variables) {
-        LabelledFormula form = null;
+        LabelledFormula form;
         if (formula2 == null)
             form = LabelledFormula.of(formula1, variables);
         else {
