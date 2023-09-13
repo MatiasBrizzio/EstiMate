@@ -107,5 +107,9 @@ To run, you have to use the script `modelcount.sh`.
 or:
 
 ```
-./modelcount.sh -formula="(F (a && p))" -k=10 -auto -vars=a,p
+./modelcount.sh -formula="(F (a && p))" -k=10 -vars=a,p [-flags] [-to=timeout]
 ```
+### Flags
+ * `-auto = enables EstiMate`
+ * `-re = uses a Regular expression model counter`
+ * `without flag; uses exact model counter`
