@@ -43,7 +43,6 @@ public class FormulaToAutomaton<S> {
     private Object2IntMap stateNumbers;
 
     public FormulaToAutomaton() {
-        labelIDs.clear();
         encoded_alphabet = -1;
         alphabetSize = 0;
     }

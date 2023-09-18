@@ -116,12 +116,16 @@ public class PreciseModelCountingEvaluation {
 
             }
             File outfolder = new File(directoryName);
-            if (!outfolder.exists())
-                outfolder.mkdir();
-            if (outname.contains("/")) {
-                filename = directoryName + outname.substring(outname.lastIndexOf('/'));
-            } else
-                filename = outname;
+            if (!outfolder.exists() && !outfolder.mkdirs()) {
+                // Handle the case where directory creation failed, e.g., due to permission issues.
+                System.err.println("Failed to create directory: " + directoryName);
+            } else {
+                if (outname.contains("/")) {
+                    filename = directoryName + outname.substring(outname.lastIndexOf('/'));
+                } else {
+                    filename = directoryName + File.separator + outname;
+                }
+            }
         }
 
         if (automaton_counting || re_counting)

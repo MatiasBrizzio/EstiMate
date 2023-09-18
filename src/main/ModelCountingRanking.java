@@ -125,12 +125,15 @@ public class ModelCountingRanking {
 
             }
             File outfolder = new File(directoryName);
-            if (!outfolder.exists())
-                outfolder.mkdir();
-            if (outname.contains("/")) {
-                filename = directoryName + outname.substring(outname.lastIndexOf('/'));
-            } else
-                filename = outname;
+            if (!outfolder.exists() && !outfolder.mkdirs()) {
+                System.err.println("Failed to create directory: " + directoryName);
+            } else {
+                if (outname.contains("/")) {
+                    filename = directoryName + outname.substring(outname.lastIndexOf('/'));
+                } else {
+                    filename = directoryName + File.separator + outname;
+                }
+            }
         }
 
         if (automaton_counting || re_counting)
@@ -146,7 +149,6 @@ public class ModelCountingRanking {
         long initialTOTALTime = System.currentTimeMillis();
         int num_of_formulas = formulas.size();
         BigInteger[] solutions = new BigInteger[num_of_formulas];
-        List<Integer> timeout_formulas = new LinkedList<>();
         int index = 0;
         System.out.println("Counting...");
 
@@ -169,7 +171,7 @@ public class ModelCountingRanking {
                 solutions[index] = (BigInteger) result;
             } else {
                 System.out.println("MC Timeout reached.");
-                timeout_formulas.add(index);
+//                timeout_formulas.add(index);
             }
             index++;
         }

@@ -33,7 +33,6 @@ public class FormulaToRE<S> {
     int base;
 
     public FormulaToRE() {
-        labelIDs.clear();
         encoded_alphabet = -1;
         alphabetSize = 0;
     }
