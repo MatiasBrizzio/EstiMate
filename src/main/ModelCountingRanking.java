@@ -344,7 +344,7 @@ public class ModelCountingRanking {
         return result;
     }
 
-    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
+    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula f, List<String> vars, int bound) {
         LabelledFormula form_lost = LabelledFormula.of(f, vars);
 //        MatrixBigIntegerModelCounting counter = new MatrixBigIntegerModelCounting(form_lost,false);
         EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting(form_lost);
