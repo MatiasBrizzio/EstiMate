@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class ModelCountingRanking {
-    private BigInteger individual_result = BigInteger.ZERO;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
@@ -60,6 +59,8 @@ public class ModelCountingRanking {
         }
         if (!formula.equals("")) {
             form = LtlParser.parse(formula, vars).formula();
+            vars.clear();
+            vars.addAll(new HashSet<>(FormulaUtils.extractAtoms(formula)));
             BigInteger result;
             if (automaton_counting || re_counting)
                 try {
@@ -376,7 +377,7 @@ public class ModelCountingRanking {
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         for (BigInteger key : ranking.keySet()) {
-            for (Integer formulas : ranking.get(key)) {
+            for (Integer ignored : ranking.get(key)) {
                 bw.write(String.valueOf(key));
                 bw.write("\n");
             }

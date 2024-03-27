@@ -4,6 +4,7 @@ package modelcounter;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import jhoafparser.ast.AtomAcceptance;
 import jhoafparser.ast.BooleanExpression;
+import main.FormulaUtils;
 import main.Settings;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
@@ -12,6 +13,7 @@ import owl.automaton.Automaton;
 import owl.automaton.acceptance.EmersonLeiAcceptance;
 import owl.automaton.edge.Edge;
 import owl.ltl.LabelledFormula;
+import owl.ltl.parser.LtlParser;
 import owl.run.DefaultEnvironment;
 import owl.translations.delag.DelagBuilder;
 
@@ -31,12 +33,14 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
     long transitions = 0;
     private FieldMatrix<BigFraction> T = null;
     private Automaton<S, EmersonLeiAcceptance> automaton = null;
-    private LabelledFormula formula;
+    private final LabelledFormula formula;
     private Object[] states = null;
 
 
     public EmersonLeiAutomatonBasedModelCounting(LabelledFormula formula) {
-        this.formula = formula;
+        Set<String> vars = new HashSet<>(FormulaUtils.extractAtoms(formula.toString()));
+        this.formula = LtlParser.parse(formula.toString(),vars.stream().toList());
+
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         // Do the call in a separate thread, get a Future back
         Future<String> future = executorService.submit(this::parse);

@@ -1,4 +1,4 @@
-package tlsf;
+package main;
 
 import owl.ltl.*;
 
@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Formula_Utils {
+public class FormulaUtils {
 
     public static List<LabelledFormula> subformulas(LabelledFormula f) {//, List<String> variables) {
         List<LabelledFormula> s = new LinkedList();
@@ -71,6 +73,19 @@ public class Formula_Utils {
             return max;
         }
         return 0;
+    }
+
+    public static Set<String> extractAtoms(String formula) {
+        Set<String> atoms = new HashSet<>();
+        Pattern pattern = Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]*|\"[^\"]+\"");
+        Matcher matcher = pattern.matcher(formula);
+
+        while (matcher.find()) {
+            String atom = matcher.group();
+            atoms.add(atom);
+        }
+
+        return atoms;
     }
 
 }

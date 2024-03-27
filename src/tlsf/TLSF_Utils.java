@@ -1,5 +1,6 @@
 package tlsf;
 
+import main.FormulaUtils;
 import owl.ltl.*;
 import owl.ltl.parser.SpectraParser;
 import owl.ltl.parser.TlsfParser;
@@ -136,7 +137,7 @@ public class TLSF_Utils {
 
         if (spec.assume().compareTo(BooleanConstant.TRUE) != 0) {
             new_tlsf_spec.append("  ASSUMPTIONS {\n");
-            for (Formula as : Formula_Utils.splitConjunction(spec.assume())) {
+            for (Formula as : FormulaUtils.splitConjunction(spec.assume())) {
                 new_tlsf_spec.append("    ").append(SolverUtils.toSolverSyntax(LabelledFormula.of(as, spec.variables()))).append(";\n");
             }
             new_tlsf_spec.append("  }\n" + '\n');
@@ -185,7 +186,7 @@ public class TLSF_Utils {
             for (Formula f : spec.thetaE()) {
                 if (hasGFPattern(f))
                     additionalAssumptions.add(f);
-                else if (Formula_Utils.numOfTemporalOperators(f) > 0)
+                else if (FormulaUtils.numOfTemporalOperators(f) > 0)
                     additionalAssumptions.add(f);
                 else
                     lst.add(f);
@@ -197,7 +198,7 @@ public class TLSF_Utils {
             for (Formula f : spec.thetaS()) {
                 if (hasGFPattern(f))
                     additionalGuarantee.add(f);
-                else if (Formula_Utils.numOfTemporalOperators(f) > 0)
+                else if (FormulaUtils.numOfTemporalOperators(f) > 0)
                     additionalGuarantee.add(f);
                 else
                     lst.add(f);
@@ -224,7 +225,7 @@ public class TLSF_Utils {
         if (!additionalAssumptions.isEmpty()) {
             new_tlsf_spec.append("  ASSUMPTIONS {\n");
             for (Formula a : additionalAssumptions) {
-                if (Formula_Utils.numOfTemporalOperators(a) > 0)
+                if (FormulaUtils.numOfTemporalOperators(a) > 0)
                     new_tlsf_spec.append("    ").append(LabelledFormula.of(a, spec.variables())).append(";\n");
                 else
                     new_tlsf_spec.append("    ").append(LabelledFormula.of(GOperator.of(FOperator.of(a)), spec.variables())).append(";\n");
@@ -236,7 +237,7 @@ public class TLSF_Utils {
             new_tlsf_spec.append("  GUARANTEES {\n");
 
             for (Formula f : additionalGuarantee) {
-                if (Formula_Utils.numOfTemporalOperators(f) > 0)
+                if (FormulaUtils.numOfTemporalOperators(f) > 0)
                     new_tlsf_spec.append("    ").append(LabelledFormula.of(f, spec.variables())).append(";\n");
                 else
                     new_tlsf_spec.append("    ").append(LabelledFormula.of(GOperator.of(FOperator.of(f)), spec.variables())).append(";\n");
