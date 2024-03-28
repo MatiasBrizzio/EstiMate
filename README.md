@@ -1,14 +1,10 @@
-# EstiMate
+# EstiMate 🦉
 
-EstiMate is an approximate model counter, designed to estimate the number of models for a given LTL formula.
-It utilizes a transfer matrix, generated through a series of tree encodings, to provide approximate model counts.
+EstiMate is an approximate model counter, designed to estimate the number of models for a given LTL formula. It utilizes a transfer matrix, generated through a series of tree encodings, to provide approximate model counts.
 
-#### Acknowledgments
+#### Acknowledgments 🌟
 
-If you utilize EstiMate for research purposes,
-we kindly request that you cite the corresponding paper where the technique was introduced and evaluated:
-[Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://dl.acm.org/doi/10.1145/3583131.3590454)
-Thank you :)
+If you utilize EstiMate for research purposes, we kindly request that you cite the corresponding paper where the technique was introduced and evaluated: [Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://dl.acm.org/doi/10.1145/3583131.3590454) Thank you :)
 
 ```
 @inproceedings{10.1145/3583131.3590454,
@@ -29,10 +25,12 @@ series = {GECCO '23}
 }
 ```
 
-## Maintainers
+
+## Maintainers 👨‍💻
+
 This code is implemented and maintained by Matias Brizzio and [Renzo Degiovanni](https://rdegiovanni.github.io)
 
-## Transfer Matrix Generation
+## Transfer Matrix Generation 🔄
 
 The transfer matrix, denoted as T<sub>ϕ</sub>, is generated using the following steps:
 
@@ -40,33 +38,20 @@ The transfer matrix, denoted as T<sub>ϕ</sub>, is generated using the following
 2. From B<sub>ϕ</sub>, generate a Finite State Automaton A<sub>ϕ</sub>.
 3. Generate the transfer matrix T<sub>ϕ</sub> from A<sub>ϕ</sub>.
 
-## Understanding the Process
+## Understanding the Process 🤔
+The Buchi automaton B<sub>ϕ</sub> recognizes lasso traces satisfying the formula ϕ. A lasso trace is an infinite trace that loops back to a previous state, forming a cycle. It accepts infinite traces, as its accepting condition requires visiting an accepting state infinitely often in the lasso trace. In contrast, finite automata recognize finite traces, as their accepting condition only requires reaching a final state.
 
-The Buchi automaton B<sub>ϕ</sub> recognizes lasso traces satisfying the formula ϕ.
-It accepts infinite traces, as its accepting condition requires visiting an accepting state infinitely often in the
-lasso trace.
-In contrast, finite automata recognize finite traces, as their accepting condition only requires reaching a final state.
+When generating the finite automaton A<sub>ϕ</sub> from B<sub>ϕ</sub>, the finite traces recognized by A<sub>ϕ</sub> become part of the lasso traces recognized by B<sub>ϕ</sub>.
 
-When generating the finite automaton A<sub>ϕ</sub> from B<sub>ϕ</sub>,
-the finite traces recognized by A<sub>ϕ</sub> become part of the lasso traces recognized by B<sub>ϕ</sub>.
+The finite automaton A<sub>ϕ</sub> is encoded into an N x N transfer matrix T<sub>ϕ</sub>, where N represents the number of states in A<sub>ϕ</sub>. Each element T<sub>ϕ</sub>[i,j] in the matrix denotes the number of transitions from state i to state j.
 
-The finite automaton A<sub>ϕ</sub> is encoded into an N x N transfer matrix T<sub>ϕ</sub>,
-where N represents the number of states in A<sub>ϕ</sub>.
-Each element T<sub>ϕ</sub>[i,j] in the matrix denotes the number of transitions from state i to state j.
+By using matrix multiplication, the number of traces of length k accepted by A<sub>ϕ</sub> can be computed as I x T<sub>ϕ</sub><sup>k</sup> x F. Here, I is a row vector representing the initial states, T<sub>ϕ</sub><sup>k</sup> is the matrix resulting from multiplying T<sub>ϕ</sub> k times, and F is a column vector representing the final states of A<sub>ϕ</sub>.
 
-By using matrix multiplication, the number of traces of length k accepted by A<sub>ϕ</sub> can be computed as I x T<sub>
-ϕ</sub><sup>k</sup> x F. Here, I is a row vector representing the initial states, T<sub>ϕ</sub><sup>k</sup> is the
-matrix resulting from multiplying T<sub>ϕ</sub> k times, and F is a column vector representing the final states of
-A<sub>ϕ</sub>.
+## Linear Temporal Logic (LTL) <a name="LTL" /> 🕰️
 
-## <a name="LTL" /> Linear Temporal Logic (LTL)
+The grammar for LTL aims to support Spot-style LTL. For further details on temporal logic, e.g., semantics, see [here](https://spot.lrde.epita.fr/tl.pdf).
 
-The grammar for LTL aims to support *Spot-style* LTL.
-For further details on temporal logic, e.g., semantics, see [here](https://spot.lrde.epita.fr/tl.pdf).
-
-The following constructs are supported:
-
-### Propositional Logic
+### Propositional Logic ✔️
 
 * True: `tt`, `true`, `1`
 * False: `ff`, `false`, `0`
@@ -79,7 +64,7 @@ The following constructs are supported:
 * Disjunction: `||`, `|`, `OR`
 * Parenthesis: `(`, `)`
 
-### Modal Logic
+### Modal Logic 🚪
 
 * Finally: `F`
 * Globally: `G`
@@ -89,21 +74,30 @@ The following constructs are supported:
 * (Weak) Release: `R`
 * Strong Release: `M`
 
-### Precedence Rules
+### Precedence Rules 📜
 
-The parser uses the following precedence:
+To ensure the accurate interpretation of provided LTL formulas, the parser adheres to the following precedence rules:
 
-`OR` < `AND` < Binary Expressions < Unary Expressions < Literals, Constants, Parentheses
+- **Binary Expressions**: These expressions involve two operands and an operator. Examples include conjunction (`&&`, `&`, `AND`), disjunction (`||`, `|`, `OR`), implication (`->`, `=>`, `IMP`), bi-implication (`<->`, `<=>`, `BIIMP`), exclusive disjunction (`^`, `XOR`), strong until (`U`), weak until (`W`), weak release (`R`), and strong release (`M`).
 
-For chained binary expressions (without parentheses), the rightmost binary operator takes precedence.
-For example, `a -> b U c` is parsed as `a -> (b U c)`.
+- **Unary Expressions**: These expressions involve a single operand and an operator. Examples include negation (`!`, `NOT`), next (`X`), globally (`G`), and finally (`F`).
 
-## RUN ESTIMATE
+- **Literals, Constants, Parentheses**: These are fundamental components of the formula. Literals represent atomic propositions, constants denote truth values (e.g., `tt` for true, `ff` for false), and parentheses are used to group subexpressions.
 
-The tool can take as input either a specification in TLSF format or directly an LTL formulae.  
-To run, you have to use the script `modelcount.sh`.
+The precedence hierarchy is structured as follows:
 
-```
+`OR` < `AND` < `Binary Expressions` < `Unary Expressions` < `Literals`, `Constants`, `Parentheses`
+
+This means that binary expressions take precedence over unary expressions, which, in turn, take precedence over literals, constants, and parentheses. For instance, in the expression `a && b || c`, the conjunction (`&&`) is evaluated before the disjunction (`||`), and parentheses can be employed to override this precedence.
+
+Moreover, for chained binary expressions lacking parentheses, the rightmost binary operator holds precedence. For example, `a -> b U c` is parsed as `a -> (b U c)`.
+
+
+## RUN ESTIMATE 🚀
+
+**The tool can take as input either a specification in TLSF format or directly an LTL formulae. To run, you have to use the script `modelcount.sh`.**
+
+```bash
 ./modelcount.sh case-studies/arbiter/arbiter.tlsf 
 ```
 
@@ -112,7 +106,17 @@ or:
 ```
 ./modelcount.sh -formula="(F (a && p))" -k=10 -vars=a,p [-flags] [-to=timeout]
 ```
-### Flags
+
+### Flags 🚩
  * `-auto = enables EstiMate`
  * `-re = uses a Regular expression model counter`
  * `without flag; uses exact model counter`
+
+
+## Contact Us 📧
+
+This README is here to give you a complete rundown of EstiMate, covering its features and how to use it effectively. If you have any questions or come across any roadblocks, don't hesitate to get in touch with us.
+
+Thanks for taking an interest in EstiMate! 🦉
+
+Happy coding and may your projects soar to new heights! 🚀
