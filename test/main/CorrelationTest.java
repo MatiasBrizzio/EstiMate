@@ -63,31 +63,4 @@ public class CorrelationTest {
 
 
     }
-
-//    @Test
-//    public void testGoogleSearch() {
-////        System.setProperty("webdriver.chrome.driver", "path_to_chrome_driver"); // Set the path to your Chrome driver
-//        WebDriver driver =  new ChromeDriver();
-//        driver.get("https://www.google.com");
-//
-//        // Find the search input field and enter a query
-//        driver.findElement(By.name("q")).sendKeys("Selenium testing");
-//
-//        // Submit the form
-//        driver.findElement(By.name("q")).submit();
-//
-//        // Wait for search results to load (you might need to adjust the delay)
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        // Assert that the page title contains the search query
-//        String pageTitle = driver.getTitle();
-//        assertTrue(pageTitle.contains("Selenium testing"));
-//        driver.quit();
-//    }
-
-
 }

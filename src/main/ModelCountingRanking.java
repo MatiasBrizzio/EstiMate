@@ -57,7 +57,7 @@ public class ModelCountingRanking {
             System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-to=timeout | -k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
             return;
         }
-        if (!formula.equals("")) {
+        if (!formula.isEmpty()) {
             form = LtlParser.parse(formula, vars).formula();
             vars.clear();
             vars.addAll(new HashSet<>(FormulaUtils.extractAtoms(formula)));
@@ -84,40 +84,43 @@ public class ModelCountingRanking {
             }
             System.out.println();
             System.exit(0);
-        } else if (filepath.endsWith(".tlsf")) {
-            Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
-            formulas.add(tlsf.toFormula().formula());
-            vars = tlsf.variables();
-        } else if (filepath.endsWith(".list")) {
-            BufferedReader reader;
-            reader = new BufferedReader(new FileReader(filepath));
-
-            String line = reader.readLine();
-            int numOfVars = 0;
-            while (line != null) {
-
-                if (!line.startsWith("--") && line.endsWith(".tlsf")) {
-                    Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(line));
-                    formulas.add(tlsf.toFormula().formula());
-                    numOfVars = Math.max(numOfVars, tlsf.variables().size());
-                }
-                line = reader.readLine();
-            }
-            reader.close();
-            for (int i = 0; i < numOfVars; i++) {
-                vars.add("v" + i);
-            }
         } else {
-            BufferedReader reader;
-            reader = new BufferedReader(new FileReader(filepath));
+            assert filepath != null;
+            if (filepath.endsWith(".tlsf")) {
+                Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
+                formulas.add(tlsf.toFormula().formula());
+                vars = tlsf.variables();
+            } else if (filepath.endsWith(".list")) {
+                BufferedReader reader;
+                reader = new BufferedReader(new FileReader(filepath));
 
-            String line = reader.readLine();
-            while (line != null) {
-                if (!line.startsWith("--"))
-                    formulas.add(LtlParser.syntax(line, vars));
-                line = reader.readLine();
+                String line = reader.readLine();
+                int numOfVars = 0;
+                while (line != null) {
+
+                    if (!line.startsWith("--") && line.endsWith(".tlsf")) {
+                        Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(line));
+                        formulas.add(tlsf.toFormula().formula());
+                        numOfVars = Math.max(numOfVars, tlsf.variables().size());
+                    }
+                    line = reader.readLine();
+                }
+                reader.close();
+                for (int i = 0; i < numOfVars; i++) {
+                    vars.add("v" + i);
+                }
+            } else {
+                BufferedReader reader;
+                reader = new BufferedReader(new FileReader(filepath));
+
+                String line = reader.readLine();
+                while (line != null) {
+                    if (!line.startsWith("--"))
+                        formulas.add(LtlParser.syntax(line, vars));
+                    line = reader.readLine();
+                }
+                reader.close();
             }
-            reader.close();
         }
 
         if (outname != null) {
@@ -328,13 +331,6 @@ public class ModelCountingRanking {
         BigInteger models = counter.count(formula, vars);
         if (models == null)
             return null;
-
-
-//        List<BigInteger> result = new LinkedList<>();
-//        for (int i = 0; i < bound - 1; i++) {
-//            result.add(BigInteger.ZERO);
-//        }
-//        result.add(models);
         return models;
     }
 

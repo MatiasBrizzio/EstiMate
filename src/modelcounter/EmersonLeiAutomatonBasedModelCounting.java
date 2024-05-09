@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 import java.util.function.IntConsumer;
 
 public class EmersonLeiAutomatonBasedModelCounting<S> {
+    private final LabelledFormula formula;
     /**
      * Build the Transfer Matrix for the given DFA
      *
@@ -33,13 +34,12 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
     long transitions = 0;
     private FieldMatrix<BigFraction> T = null;
     private Automaton<S, EmersonLeiAcceptance> automaton = null;
-    private final LabelledFormula formula;
     private Object[] states = null;
 
 
     public EmersonLeiAutomatonBasedModelCounting(LabelledFormula formula) {
         Set<String> vars = new HashSet<>(FormulaUtils.extractAtoms(formula.toString()));
-        this.formula = LtlParser.parse(formula.toString(),vars.stream().toList());
+        this.formula = LtlParser.parse(formula.toString(), vars.stream().toList());
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         // Do the call in a separate thread, get a Future back
