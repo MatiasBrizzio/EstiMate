@@ -99,12 +99,9 @@ public class MatrixBigIntegerModelCounting {
         int bound = exhaustive ? k + 1 : k;
         FieldMatrix T_res = T.power(bound);
         FieldMatrix reachable = u.multiply(T_res);
-//		System.out.println("reachable: " + reachable.toString());
         FieldMatrix result = reachable.multiply(v);
-//		System.out.println("result: " + result.toString());
         BigFraction value = (BigFraction) result.getEntry(0, 0);
-        BigInteger count = value.getNumerator();
-        return count;
+        return value.getNumerator();
     }
 
     /**
@@ -129,7 +126,7 @@ public class MatrixBigIntegerModelCounting {
                 pData[i][j] = v;
             }
         }
-        return new Array2DRowFieldMatrix<BigFraction>(pData, false);
+        return new Array2DRowFieldMatrix<>(pData, false);
     }
 
 

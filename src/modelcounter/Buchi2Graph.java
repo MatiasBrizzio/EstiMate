@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Buchi2Graph {
     public static Graph<String> LTL2Graph(LabelledFormula formula) throws IOException, InterruptedException {
-        FormulaToAutomaton translator = new FormulaToAutomaton();
+        FormulaToAutomaton translator = new FormulaToAutomaton<>();
         translator.generateLabels(formula.variables());
         automata.Automaton dfa = translator.formulaToDfa(formula);
         return dfaToGraph(dfa);
@@ -18,7 +18,6 @@ public class Buchi2Graph {
 
     public static Graph<String> dfaToGraph(automata.Automaton dfa) {
         Graph<String> g = new Graph<>();
-        //Setear estados iniciales.
         State is = dfa.getInitialState();
         if (is == null) //dfa is empty
             return g;
@@ -26,9 +25,7 @@ public class Buchi2Graph {
         g.setInit(in);
         Transition[] transitions = dfa.getTransitions();
 
-        for (int i = 0; i < transitions.length; i++) {
-            Transition t = transitions[i];
-
+        for (Transition t : transitions) {
             State from = t.getFromState();
             Node<String> s1 = getNode(g, from.getName());
 
@@ -47,12 +44,10 @@ public class Buchi2Graph {
 
         //add final states
         State[] finalStates = dfa.getFinalStates();
-        for (int i = 0; i < finalStates.length; i++) {
-            State acc = finalStates[i];
+        for (State acc : finalStates) {
             Node<String> s = getNode(g, acc.getName());
             s.setBooleanAttribute("accepting", true);
         }
-//		System.out.println(g);
         return g;
     }
 

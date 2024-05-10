@@ -21,12 +21,12 @@ public class Count {
         String abcRE = genABCString(formula);
         String[] arr = Discretizer.or(abcRE);
         BigInteger result = BigInteger.ZERO;
-        for (int i = 0; i < arr.length; i++) {
+        for (String string : arr) {
             BigInteger count;
             LinkedList<String> abcStrs = new LinkedList<>();
-            String s = translatorLTLtoRE.toABClanguage(arr[i]);
+            String s = translatorLTLtoRE.toABClanguage(string);
             abcStrs.add(s);
-            System.out.print(arr[i].length() + " ");
+            System.out.print(string.length() + " ");
             ABC abc = new ABC();
             if (translatorLTLtoRE.encoded_alphabet == 0)
                 count = abc.count(abcStrs, bound * 2, exhaustive, positive);//each state is characterised by 2 characters
@@ -48,7 +48,7 @@ public class Count {
         String alph = alphabet.toString();
 
         String form = "LTL=" + ltl;
-        if (alph != null && !alph.equals(""))
+        if (alph != null && !alph.isEmpty())
             form += ",ALPHABET=" + alph;
         if (alph != null && formula.variables().size() > 5 && formula.variables().size() < 12)
             translatorLTLtoRE.encoded_alphabet = 0;

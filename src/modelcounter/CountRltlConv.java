@@ -22,7 +22,7 @@ public class CountRltlConv {
         String ltl = SolverUtils.toLambConvSyntax(label_formula.toString());
         String alph = alphabet.toString();
         String form = "LTL=" + ltl;
-        if (alph != null && !alph.equals(""))
+        if (alph != null && !alph.isEmpty())
             form += ",ALPHABET=" + alph;
         return form;
     }
