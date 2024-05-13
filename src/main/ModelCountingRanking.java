@@ -2,6 +2,7 @@ package main;
 
 import modelcounter.CountRltlConv;
 import modelcounter.EmersonLeiAutomatonBasedModelCounting;
+import modelcounter.MatrixBigIntegerModelCounting;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
@@ -233,7 +234,7 @@ public class ModelCountingRanking {
         }
     }
 
-    static void runPrefixesMC(List<Formula> formulas, List<String> vars, int bound, String outname, boolean re_counting) throws IOException, InterruptedException {
+    static void runPrefixesMC(List<Formula> formulas, List<String> vars, int bound, String outname, boolean re_counting) throws IOException {
         long initialTOTALTime = System.currentTimeMillis();
         int num_of_formulas = formulas.size();
         BigInteger[] solutions = new BigInteger[num_of_formulas];
@@ -341,10 +342,10 @@ public class ModelCountingRanking {
         return result;
     }
 
-    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula f, List<String> vars, int bound) {
+    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
         LabelledFormula form_lost = LabelledFormula.of(f, vars);
 //        MatrixBigIntegerModelCounting counter = new MatrixBigIntegerModelCounting(form_lost,false);
-        EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting(form_lost);
+        EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting<>(form_lost);
         BigInteger result = counter.count(bound);
 
         return result;

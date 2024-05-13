@@ -12,34 +12,38 @@ import org.apache.commons.math3.linear.FieldMatrix;
 import owl.automaton.Automaton;
 import owl.automaton.acceptance.EmersonLeiAcceptance;
 import owl.automaton.edge.Edge;
+import owl.ltl.BooleanConstant;
+import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
+import owl.ltl.rewriter.SyntacticSimplifier;
+import owl.ltl.visitors.SolverSyntaxOperatorReplacer;
 import owl.run.DefaultEnvironment;
 import owl.translations.delag.DelagBuilder;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.function.IntConsumer;
 
 public class EmersonLeiAutomatonBasedModelCounting<S> {
     private final LabelledFormula formula;
-    /**
-     * Build the Transfer Matrix for the given DFA
-     *
-     * @param automaton is the DFA
-     * @return a n x n matrix M where M[i,j] is the number of transitions from state si to state sj
-     */
     long transitions = 0;
     private FieldMatrix<BigFraction> T = null;
     private Automaton<S, EmersonLeiAcceptance> automaton = null;
     private Object[] states = null;
 
-
     public EmersonLeiAutomatonBasedModelCounting(LabelledFormula formula) {
-        Set<String> vars = new HashSet<>(FormulaUtils.extractAtoms(formula.toString()));
-        this.formula = LtlParser.parse(formula.toString(), vars.stream().toList());
+        List<String> vars = new HashSet<>(FormulaUtils.extractAtoms(formula.toString())).stream().toList();
+
+        SolverSyntaxOperatorReplacer visitor = new SolverSyntaxOperatorReplacer();
+        SyntacticSimplifier simp = new SyntacticSimplifier();
+        Formula simplified = formula.formula().accept(visitor).accept(simp);
+        LabelledFormula simp_formula = LabelledFormula.of(simplified, vars);
+
+        this.formula = LtlParser.parse(simp_formula.toString(), vars);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         // Do the call in a separate thread, get a Future back
@@ -63,10 +67,13 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
     }
 
     public BigInteger count(int bound) {
+        // UNSAT formulas have no models.
+        if (this.formula.formula().equals(BooleanConstant.FALSE)) return BigInteger.ZERO;
+
         //We compute uTkv, where u is the row vector such that ui = 1 if and only if i is the start state and 0 otherwise,
         // and v is the column vector where vi = 1 if and only if i is an accepting state and 0 otherwise.
-        if (states == null)
-            return null;
+        if (states == null) return null;
+
         Settings.MC_BOUND = bound;
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         // Do the call in a separate thread, get a Future back
@@ -80,7 +87,7 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("EmersonLeiAutomatonBasedModelCounting::count ERROR. " + e.getMessage());
         }
-        return null;
+        return BigInteger.ZERO;
     }
 
     private BigInteger countModels() {
