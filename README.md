@@ -140,3 +140,6 @@ This README is here to give you a complete rundown of EstiMate, covering its fea
 Thanks for taking an interest in EstiMate! 🦉
 
 Happy coding and may your projects soar to new heights! 🚀
+
+## Publications Using EstiMate
+EstiMate has recently been employed to resolve conflicts within complex real-world LTL specifications [[1]](https://link.springer.com/chapter/10.1007/978-3-031-30826-0_1). Additionally, it has been utilized to detect bugs in some of the most commonly used SAT solvers [[2]](https://dl.acm.org/doi/abs/10.1145/3597503.3639087) within the SE and formal methods communities
