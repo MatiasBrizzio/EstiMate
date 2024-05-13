@@ -29,7 +29,7 @@ def main():
         parser.error("Please provide the CNF formula file")
     if ( (not args.noCSVSADS) and args.EDR):
         parser.error("CSVSADS and EDR cannot be used together ")
-    cmd = "/usr/bin/time --verbose -o timeoutfile ./lib/ltl-model-counter/ganak -cs " + str(args.cs) + " -t " + str(args.t) + " "
+    cmd = "/usr/bin/time -o timeoutfile ./lib/ltl-model-counter/ganak -cs " + str(args.cs) + " -t " + str(args.t) + " "
     cmd += " -seed "+ str(args.seed) + " " 
     if (args.noCC):
         cmd += "-noCC "
@@ -69,9 +69,9 @@ def main():
     os.system(cmd)
     f = open("timeoutfile")
     text = f.read()
+    print(text)
     f.close()
-    total_user_time += float(re.findall(r"User time.*",text)[0].split(":")[1])
-
+    total_user_time += float(re.findall(r"user\s+(\d+\.\d+)", text)[0])
     f = open("outputfile")
     output  = f.read().strip().split("\n")[-1]
     f.close()
