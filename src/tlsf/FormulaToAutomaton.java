@@ -32,7 +32,7 @@ import java.util.function.IntConsumer;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public class FormulaToAutomaton{
+public class FormulaToAutomaton {
 
     //Map labels to ids
     public Map<String, String> labelIDs = new HashMap<>();

@@ -2,7 +2,6 @@ package main;
 
 import modelcounter.CountRltlConv;
 import modelcounter.EmersonLeiAutomatonBasedModelCounting;
-import modelcounter.MatrixBigIntegerModelCounting;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;

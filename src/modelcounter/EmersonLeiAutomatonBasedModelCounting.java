@@ -64,7 +64,7 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
         DelagBuilder translator = new DelagBuilder(DefaultEnvironment.standard());
         automaton = (Automaton<S, EmersonLeiAcceptance>) translator.apply(formula);
         var aux = automaton.states().stream().toList();
-        IntStream.range(0, aux.size()).forEach(i -> states.add(i,aux.get(i)));
+        IntStream.range(0, aux.size()).forEach(i -> states.add(i, aux.get(i)));
         return "OK";
     }
 
@@ -94,15 +94,15 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
     private BigInteger countModels() {
         T = buildTransferMatrix();
         //set initial states
-        FieldMatrix<BigFraction>  u = buildInitialStates();
+        FieldMatrix<BigFraction> u = buildInitialStates();
 
         //set final states
-        FieldMatrix<BigFraction>  v = buildFinalStates();
+        FieldMatrix<BigFraction> v = buildFinalStates();
 
         // count models
-        FieldMatrix<BigFraction>  T_res = T.power(Settings.MC_BOUND);
-        FieldMatrix<BigFraction>  reachable = u.multiply(T_res);
-        FieldMatrix<BigFraction>  result = reachable.multiply(v);
+        FieldMatrix<BigFraction> T_res = T.power(Settings.MC_BOUND);
+        FieldMatrix<BigFraction> reachable = u.multiply(T_res);
+        FieldMatrix<BigFraction> result = reachable.multiply(v);
         BigFraction value = result.getEntry(0, 0);
         return value.getNumerator();
     }
@@ -129,10 +129,10 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
         return new Array2DRowFieldMatrix<>(pData, false);
     }
 
-    public FieldMatrix<BigFraction>  buildInitialStates() {
+    public FieldMatrix<BigFraction> buildInitialStates() {
         int n = T.getRowDimension();
         //set initial states
-        FieldMatrix<BigFraction>  u = createMatrix(1, n);
+        FieldMatrix<BigFraction> u = createMatrix(1, n);
         Set<S> initial_states = automaton.initialStates();
         for (int j = 0; j < n; j++) {
             if (initial_states.contains(states.get(j)))
@@ -141,7 +141,7 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
         return u;
     }
 
-    public FieldMatrix<BigFraction>  buildFinalStates() {
+    public FieldMatrix<BigFraction> buildFinalStates() {
         int n = T.getRowDimension();
         //set final states
         Set<S> final_states = new HashSet<>();
@@ -158,7 +158,7 @@ public class EmersonLeiAutomatonBasedModelCounting<S> {
             }
         }
 
-        FieldMatrix<BigFraction>  v = createMatrix(n, 1);
+        FieldMatrix<BigFraction> v = createMatrix(n, 1);
         for (int i = 0; i < n; i++) {
             if (final_states.contains(states.get(i))) {
                 v.addToEntry(i, 0, new BigFraction(1));

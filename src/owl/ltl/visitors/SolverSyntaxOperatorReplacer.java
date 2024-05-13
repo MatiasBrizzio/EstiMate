@@ -80,9 +80,9 @@ public class SolverSyntaxOperatorReplacer implements Visitor<Formula> {
         // p R q" <-> q w (q && p) <-> (q U (q && p)) || G q
         Formula left = rOperator.left.accept(this);
         Formula right = rOperator.right.accept(this);
-        Formula uOperator = UOperator.of(right, Conjunction.of(right,left));
+        Formula uOperator = UOperator.of(right, Conjunction.of(right, left));
         Formula gOperator = UOperator.of(BooleanConstant.TRUE, right.not()).not();
-        return Disjunction.of(uOperator,gOperator);
+        return Disjunction.of(uOperator, gOperator);
     }
 
     @Override
