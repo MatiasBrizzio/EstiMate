@@ -37,11 +37,16 @@ if [[ $solver == cachet ]]
 then
 	./lib/ltl-model-counter/cachet $cnffile
 else
-	if [[ $solver == miniC2D ]]
-	then
+if [[ $solver == miniC2D ]]
+then
 		./lib/ltl-model-counter/miniC2D -C -c $cnffile
-	
-	else
-		./lib/ltl-model-counter/relsat_macos -p0 -#c -u300 -on -t3600 -v $varsfile $cnffile 
-	fi
+else
+if [[ $solver == ganak ]]
+then
+  echo "check if ganak supports your OS"
+  #./lib/ltl-model-counter/ganak $cnffile
+else
+	./lib/ltl-model-counter/relsat_macos -p0 -#c -u300 -on -t3600 -v $varsfile $cnffile
+fi
+fi
 fi

@@ -20,17 +20,7 @@ public class PreciseLTLModelCounter {
     public int numOfTimeout = 0;
     public int numOfError = 0;
     public int numOfCalls = 0;
-    public MODEL_COUNTER modelcounter = MODEL_COUNTER.RELSAT;
-
-    public String getCommandLTL2PL() {
-        String cmd;
-        String currentOS = System.getProperty("os.name");
-        if (currentOS.startsWith("Mac"))
-            cmd = "./lib/ltl-model-counter/ltl2pl_macos.sh " + INFILE + " " + BASENAME + " " + Settings.MC_BOUND + " " + modelcounter.toString();
-        else
-            cmd = "./lib/ltl-model-counter/ltl2pl.sh" + INFILE + " " + BASENAME + " " + Settings.MC_BOUND + " " + modelcounter.toString();
-        return cmd;
-    }
+    public MODEL_COUNTER modelcounter = MODEL_COUNTER.CACHET;
 
     public String getCommand() {
         String cmd;
@@ -52,12 +42,9 @@ public class PreciseLTLModelCounter {
 
     public BigInteger count(String formula, List<String> variables) throws IOException, InterruptedException {
         numOfCalls++;
-//		System.out.println(formula);
         Process p = null;
-
         // make formula file
         if (formula != null && variables != null) {
-//			toCNF(formula, variables);
             File f = new File(INFILE);
             FileWriter fw = new FileWriter(f);
             for (String v : variables)
@@ -103,7 +90,6 @@ public class PreciseLTLModelCounter {
                 }
             }
 
-            // Leer el error del programa.
             InputStream err = p.getErrorStream();
             InputStreamReader errread = new InputStreamReader(err);
             BufferedReader errbufferedreader = new BufferedReader(errread);
@@ -131,66 +117,7 @@ public class PreciseLTLModelCounter {
 
         OutputStream os = p.getOutputStream();
         if (os != null) os.close();
-
         return numOfModels;
-    }
-
-    private void toCNF(String formula, List<String> variables) throws IOException, InterruptedException {
-        File f = new File(INFILE);
-        FileWriter fw = new FileWriter(f);
-        for (String v : variables)
-            fw.append(v).append("\n");
-        fw.append("###\n");
-        fw.append(formula).append("\n");
-        fw.close();
-
-        // run ltl2pl command
-        String cmdltl2pl = getCommandLTL2PL();
-        Process p = Runtime.getRuntime().exec(cmdltl2pl);
-        p.waitFor(Settings.MC_TIMEOUT, TimeUnit.SECONDS);
-
-        //read all CNF clauses
-        List<String> vars = new LinkedList<>(); //BMC variables
-        for (String v : variables) {
-            for (int i = 0; i < Settings.MC_BOUND + 1; i++)
-                vars.add(v + i);
-        }
-        for (int i = 0; i < Settings.MC_BOUND; i++)
-            vars.add("l" + i);
-
-        List<Formula> clauses = new LinkedList<>();
-        BufferedReader br = new BufferedReader(new FileReader(PROP_FILE));
-        String prop_str = br.readLine();
-        while (prop_str != null && !prop_str.equals("")) {
-            Formula clause = LtlParser.syntax(prop_str, vars);
-            clauses.add(clause);
-            prop_str = br.readLine();
-        }
-        br.close();
-//		System.out.println(prop_str);
-        fw = new FileWriter(new File(PROP_CNF_FILE));
-        fw.append("p cnf ").append(String.valueOf(vars.size())).append(" ").append(String.valueOf(clauses.size())).append("\n");
-        for (Formula clause : clauses)
-            fw.append(cnfStr(clause)).append("\n");
-//		System.out.println(cnf_formula.toString());
-//
-//		fw.append(cnf_formula.toString());
-        fw.close();
-    }
-
-    private String cnfStr(Formula f) {
-        if (!(f instanceof Disjunction))
-            throw new IllegalArgumentException("LTLModelCounter: formula is not in cnf format");
-        Disjunction clause = (Disjunction) f;
-        StringBuilder cnf = new StringBuilder();
-        for (Formula c : clause.children()) {
-            Literal l = (Literal) c;
-            if (l.isNegated()) cnf.append("-");
-            cnf.append(l.getAtom() + 1);
-            cnf.append(" ");
-        }
-        cnf.append("0");
-        return cnf.toString();
     }
 
     public enum MODEL_COUNTER {
@@ -218,4 +145,5 @@ public class PreciseLTLModelCounter {
         }
 
     }
+
 }

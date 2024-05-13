@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class Main {
-
+    static String solver = "";
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
         Formula form;
@@ -41,6 +41,8 @@ public class Main {
                 re_counting = true;
             } else if (arg.startsWith("-formula=")) {
                 formula = arg.replace("-formula=", "");
+            } else if (arg.startsWith("-exact=")) {
+                solver = arg.replace("-exact=", "");
             } else {
                 filepath = arg;
             }
@@ -53,7 +55,7 @@ public class Main {
         String filename = "result/default.out";
 
         if (filepath == null && formula.isEmpty()) {
-            System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-to=timeout | -k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
+            System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-to=timeout | -k=bound | -auto | -re | -vars=a,b,c | -exact=[cachet|miniC2D|relsat]]");
             return;
         }
         if (!formula.isEmpty()) {
@@ -322,6 +324,12 @@ public class Main {
 
     static BigInteger countModelsExact(Formula formula, int vars, int bound) throws IOException, InterruptedException {
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
+        if (solver.equals(PreciseLTLModelCounter.MODEL_COUNTER.MINIC2D.toString()))
+            counter.modelcounter = PreciseLTLModelCounter.MODEL_COUNTER.MINIC2D;
+        else if (solver.equals(PreciseLTLModelCounter.MODEL_COUNTER.CACHET.toString()))
+            counter.modelcounter = PreciseLTLModelCounter.MODEL_COUNTER.CACHET;
+        else counter.modelcounter = PreciseLTLModelCounter.MODEL_COUNTER.RELSAT;
+        System.out.println(counter.modelcounter);
         Settings.MC_BOUND = bound;
         return counter.count(formula, vars);
     }
@@ -336,9 +344,7 @@ public class Main {
         LabelledFormula form_lost = LabelledFormula.of(f, vars);
 //        MatrixBigIntegerModelCounting counter = new MatrixBigIntegerModelCounting(form_lost,false);
         EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting<>(form_lost);
-        BigInteger result = counter.count(bound);
-
-        return result;
+        return counter.count(bound);
     }
 
     private static void writeFile(String filename, BigInteger result, String time) throws IOException {
