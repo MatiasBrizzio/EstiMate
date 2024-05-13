@@ -1,4 +1,4 @@
-package tlsf;
+package helpers;
 
 import org.junit.jupiter.api.Test;
 import owl.ltl.Formula;
@@ -59,7 +59,7 @@ public class FormulaToRETest {
     @Test
     public void testMinepump0() throws IOException, InterruptedException {
         String filename = "examples/minepump-2.tlsf";
-        Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filename));
+        Tlsf tlsf = TlsfUtils.toBasicTLSF(new File(filename));
         List<String> vars = tlsf.variables();
         LabelledFormula orig = tlsf.toFormula();
         SyntacticSimplifier simp = new SyntacticSimplifier();

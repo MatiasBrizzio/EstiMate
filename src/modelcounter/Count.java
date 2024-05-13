@@ -2,7 +2,7 @@ package modelcounter;
 
 import owl.ltl.LabelledFormula;
 import regular.Discretizer;
-import solvers.SolverUtils;
+import helpers.SolverUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;

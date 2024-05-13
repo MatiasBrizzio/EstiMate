@@ -1,20 +1,15 @@
-package tlsf;
+package helpers;
 
-import main.FormulaUtils;
 import owl.ltl.*;
-import owl.ltl.parser.SpectraParser;
 import owl.ltl.parser.TlsfParser;
-import owl.ltl.spectra.Spectra;
 import owl.ltl.tlsf.Tlsf;
 import owl.ltl.tlsf.Tlsf.Semantics;
-import solvers.SolverUtils;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-public class TLSF_Utils {
+public class TlsfUtils {
     private static String getCommand() {
         String osName = System.getProperty("os.name").toLowerCase();
         return osName.contains("mac") ? "syfco" : "./lib/syfco";

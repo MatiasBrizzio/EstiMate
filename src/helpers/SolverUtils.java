@@ -1,4 +1,4 @@
-package solvers;
+package helpers;
 
 import owl.ltl.LabelledFormula;
 

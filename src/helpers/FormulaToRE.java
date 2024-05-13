@@ -1,4 +1,4 @@
-package tlsf;
+package helpers;
 
 import automata.fsa.*;
 import jhoafparser.ast.AtomLabel;

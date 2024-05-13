@@ -1,4 +1,4 @@
-package main;
+package helpers;
 
 import owl.ltl.*;
 
@@ -20,30 +20,6 @@ public class FormulaUtils {
         } else if (f != BooleanConstant.TRUE)
             conjuncts.add(f);
         return conjuncts;
-    }
-
-    public static int numOfTemporalOperators(Formula formula) {
-        if (formula == null || formula instanceof Literal)
-            return 0;
-        if (formula instanceof Formula.TemporalOperator && !(formula instanceof XOperator)) {
-            int max = 0;
-            for (Formula c : formula.children()) {
-                int aux = numOfTemporalOperators(c);
-                if (max < aux)
-                    max = aux;
-            }
-            return max + 1;
-        }
-        if (formula instanceof Formula.LogicalOperator) {
-            int max = 0;
-            for (Formula c : formula.children()) {
-                int aux = numOfTemporalOperators(c);
-                if (max < aux)
-                    max = aux;
-            }
-            return max;
-        }
-        return 0;
     }
 
     public static Set<String> extractAtoms(String formula) {

@@ -4,7 +4,7 @@ import automata.State;
 import automata.Transition;
 import gov.nasa.ltl.graph.*;
 import owl.ltl.LabelledFormula;
-import tlsf.FormulaToAutomaton;
+import helpers.FormulaToAutomaton;
 
 import java.io.IOException;
 

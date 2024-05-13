@@ -7,7 +7,7 @@ import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.rewriter.NormalForms;
-import solvers.PreciseLTLModelCounter;
+import modelcounter.PreciseLTLModelCounter;
 
 import java.io.*;
 import java.math.BigInteger;

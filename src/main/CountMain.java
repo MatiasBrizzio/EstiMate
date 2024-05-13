@@ -1,5 +1,7 @@
-package modelcounter;
+package main;
 
+import modelcounter.ABC;
+import modelcounter.Rltlconv_LTLModelCounter;
 import regular.Discretizer;
 
 import java.io.IOException;

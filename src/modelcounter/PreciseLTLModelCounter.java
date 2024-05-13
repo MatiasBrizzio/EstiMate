@@ -1,10 +1,7 @@
-package solvers;
+package modelcounter;
 
 import main.Settings;
-import owl.ltl.Disjunction;
 import owl.ltl.Formula;
-import owl.ltl.Literal;
-import owl.ltl.parser.LtlParser;
 
 import java.io.*;
 import java.math.BigInteger;

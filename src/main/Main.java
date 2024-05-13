@@ -1,13 +1,14 @@
 package main;
 
+import helpers.FormulaUtils;
 import modelcounter.CountRltlConv;
 import modelcounter.EmersonLeiAutomatonBasedModelCounting;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.tlsf.Tlsf;
-import solvers.PreciseLTLModelCounter;
-import tlsf.TLSF_Utils;
+import modelcounter.PreciseLTLModelCounter;
+import helpers.TlsfUtils;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -87,7 +88,7 @@ public class Main {
             System.exit(0);
         } else {
             if (filepath.endsWith(".tlsf")) {
-                Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
+                Tlsf tlsf = TlsfUtils.toBasicTLSF(new File(filepath));
                 formulas.add(tlsf.toFormula().formula());
                 vars = tlsf.variables();
             } else if (filepath.endsWith(".list")) {
@@ -99,7 +100,7 @@ public class Main {
                 while (line != null) {
 
                     if (!line.startsWith("--") && line.endsWith(".tlsf")) {
-                        Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(line));
+                        Tlsf tlsf = TlsfUtils.toBasicTLSF(new File(line));
                         formulas.add(tlsf.toFormula().formula());
                         numOfVars = Math.max(numOfVars, tlsf.variables().size());
                     }

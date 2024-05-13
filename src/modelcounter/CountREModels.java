@@ -1,7 +1,7 @@
-package tlsf;
+package modelcounter;
 
-import modelcounter.ABC;
 import owl.ltl.LabelledFormula;
+import helpers.FormulaToRE;
 
 import java.io.IOException;
 import java.math.BigInteger;

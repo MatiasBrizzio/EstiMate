@@ -4,7 +4,7 @@ package modelcounter;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import jhoafparser.ast.AtomAcceptance;
 import jhoafparser.ast.BooleanExpression;
-import main.FormulaUtils;
+import helpers.FormulaUtils;
 import main.Settings;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
