@@ -82,10 +82,18 @@ public class FormulaUtils {
 
         while (matcher.find()) {
             String atom = matcher.group();
-            atoms.add(atom);
+            if (!isKeyword(atom)) { // Check if it's not a keyword
+                atoms.add(atom);
+            }
         }
 
         return atoms;
+    }
+
+    public static boolean isKeyword(String token) {
+        Set<String> keywords = Set.of("!", "NOT", "->", "=>", "IMP", "<->", "<=>",
+                "BIIMP", "^", "XOR", "&&", "&", "AND", "||", "|", "OR", "(", ")", "F", "G", "X", "U", "W", "R", "M");
+        return keywords.contains(token);
     }
 
 }

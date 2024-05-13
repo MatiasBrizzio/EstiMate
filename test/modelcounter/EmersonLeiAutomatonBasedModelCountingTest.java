@@ -26,8 +26,8 @@ public class EmersonLeiAutomatonBasedModelCountingTest {
 
     @Test
     public void test2() throws ParseErrorException, IOException, InterruptedException {
-        List<String> vars = List.of("a", "b");
-        LabelledFormula formula = LtlParser.parse("G(a -> X(b))", vars);
+        List<String> vars = List.of("aA", "b");
+        LabelledFormula formula = LtlParser.parse("G(aA->X(b))", vars);
         EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting(formula);
         BigInteger d = counter.count(4);
         System.out.println(d);
