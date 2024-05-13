@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Buchi2Graph {
     public static Graph<String> LTL2Graph(LabelledFormula formula) throws IOException, InterruptedException {
-        FormulaToAutomaton translator = new FormulaToAutomaton<>();
+        FormulaToAutomaton translator = new FormulaToAutomaton();
         translator.generateLabels(formula.variables());
         automata.Automaton dfa = translator.formulaToDfa(formula);
         return dfaToGraph(dfa);

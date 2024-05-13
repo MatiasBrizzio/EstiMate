@@ -11,38 +11,9 @@ import java.util.regex.Pattern;
 
 public class FormulaUtils {
 
-    public static List<LabelledFormula> subformulas(LabelledFormula f) {//, List<String> variables) {
-        List<LabelledFormula> s = new LinkedList();
-
-        for (Formula c : f.formula().children()) {
-            LabelledFormula sf = LabelledFormula.of(c, f.variables());
-            s.addAll(subformulas(sf));
-        }
-        s.add(LabelledFormula.of(f.formula(), f.variables()));
-        return s;
-    }
-
-    public static Set<Formula> subformulas(Formula f) {//, List<String> variables) {
-        Set<Formula> s = new HashSet<>();
-
-        for (Formula c : f.children()) {
-            s.addAll(subformulas(c));
-        }
-        s.add(f);
-        return s;
-    }
-
-    public static int formulaSize(Formula f) {//, List<String> variables) {
-        int size = 1;
-        for (Formula c : f.children())
-            size += formulaSize(c);
-        return size;
-    }
-
     public static List<Formula> splitConjunction(Formula f) {
         List<Formula> conjuncts = new LinkedList<>();
-        if (f instanceof Conjunction) {
-            Conjunction conjunction = (Conjunction) f;
+        if (f instanceof Conjunction conjunction) {
             for (Formula c : conjunction.children)
                 if (c != BooleanConstant.TRUE)
                     conjuncts.addAll(splitConjunction(c));

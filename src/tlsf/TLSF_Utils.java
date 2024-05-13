@@ -24,7 +24,7 @@ public class TLSF_Utils {
         return cmd;
     }
 
-    private static boolean hasSyfcoSintax(File spec) throws InterruptedException, IOException {
+    private static boolean hasSyfcoSyntax(File spec) throws InterruptedException, IOException {
         String cmd = getCommand();
         cmd += " " + spec.getPath();
         Process pr = Runtime.getRuntime().exec(cmd);
@@ -44,7 +44,7 @@ public class TLSF_Utils {
         BufferedReader bufferedreader = new BufferedReader(inread);
         String aux;
         aux = bufferedreader.readLine();
-        return aux.length() == 0;
+        return aux.isEmpty();
     }
 
     public static Tlsf toBasicTLSF(File spec) throws IOException, InterruptedException {
@@ -59,7 +59,7 @@ public class TLSF_Utils {
             spec = new File(tlsf_name);
         }
 
-        if (hasSyfcoSintax(spec)) {
+        if (hasSyfcoSyntax(spec)) {
             if (isBasic(spec))
                 return TlsfParser.parse(new FileReader(spec));
         } else {

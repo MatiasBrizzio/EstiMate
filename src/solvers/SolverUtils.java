@@ -39,7 +39,7 @@ public class SolverUtils {
     }
 
     private static String processLTLFormula(String formula, boolean aalta_syntax) {
-        String processedFormula = aalta_syntax ? formula.replaceAll("\\!", "~") : formula.replaceAll("\\!", "!");
+        String processedFormula = formula.replaceAll("!", aalta_syntax ? "~" : "!");
         processedFormula = processedFormula.replaceAll("([A-Z])", " $1 ");
         return replaceLTLConstructions(processedFormula);
     }

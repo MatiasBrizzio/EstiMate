@@ -19,9 +19,7 @@ public class LTLSolver {
         return osName.contains("mac") ? "./lib/aalta" : "./lib/aalta_linux";
     }
 
-
     public static SolverResult isSAT(String formula) throws IOException, InterruptedException {
-        System.out.println(formula);
         numOfCalls++;
         ProcessBuilder processBuilder = null;
 

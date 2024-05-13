@@ -25,26 +25,25 @@ public class ModelCountingRanking {
         int bound = 0;
         String filepath = null;
         List<String> vars = new LinkedList<>();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("-k=")) {
-                String val = args[i].replace("-k=", "");
+        for (String arg : args) {
+            if (arg.startsWith("-k=")) {
+                String val = arg.replace("-k=", "");
                 bound = Integer.parseInt(val);
-            } else if (args[i].startsWith("-to=")) {
-                String val = args[i].replace("-to=", "");
+            } else if (arg.startsWith("-to=")) {
+                String val = arg.replace("-to=", "");
                 Settings.MC_TIMEOUT = Integer.parseInt(val);
-            } else if (args[i].startsWith("-vars=")) {
-                Collections.addAll(vars, args[i].replace("-vars=", "").split(","));
-            } else if (args[i].startsWith("-out=")) {
-                outname = args[i].replace("-out=", "");
-            } else if (args[i].startsWith("-auto")) {
+            } else if (arg.startsWith("-vars=")) {
+                Collections.addAll(vars, arg.replace("-vars=", "").split(","));
+            } else if (arg.startsWith("-out=")) {
+                outname = arg.replace("-out=", "");
+            } else if (arg.startsWith("-auto")) {
                 automaton_counting = true;
-            } else if (args[i].startsWith("-re")) {
+            } else if (arg.startsWith("-re")) {
                 re_counting = true;
-            } else if (args[i].startsWith("-formula=")) {
-                formula = args[i].replace("-formula=", "");
-//                System.out.println(formula);
+            } else if (arg.startsWith("-formula=")) {
+                formula = arg.replace("-formula=", "");
             } else {
-                filepath = args[i];
+                filepath = arg;
             }
 
         }
@@ -54,7 +53,7 @@ public class ModelCountingRanking {
 
         String filename = "result/default.out";
 
-        if (filepath == null && formula.equals("")) {
+        if (filepath == null && formula.isEmpty()) {
             System.out.println("Use ./modelcounter.sh [-formula=LTL-Formula | -b=pathToFile] [-to=timeout | -k=bound | -auto | -re | -vars=a,b,c | -no-precise]");
             return;
         }
@@ -86,7 +85,6 @@ public class ModelCountingRanking {
             System.out.println();
             System.exit(0);
         } else {
-            assert filepath != null;
             if (filepath.endsWith(".tlsf")) {
                 Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filepath));
                 formulas.add(tlsf.toFormula().formula());
@@ -173,10 +171,9 @@ public class ModelCountingRanking {
                     String filename = outname.replace(".out", index + ".out");
                     writeFile(filename, result, time);
                 }
-                solutions[index] = (BigInteger) result;
+                solutions[index] = result;
             } else {
                 System.out.println("MC Timeout reached.");
-//                timeout_formulas.add(index);
             }
             index++;
         }
@@ -184,7 +181,7 @@ public class ModelCountingRanking {
         System.out.println("Global ranking...");
         SortedMap<BigInteger, List<Integer>> global_ranking = new TreeMap<>();
         for (int i = 0; i < num_of_formulas; i++) {
-            BigInteger key = (BigInteger) solutions[i];
+            BigInteger key = solutions[i];
             if (key != null) {
                 List<Integer> value;
                 if (global_ranking.containsKey(key))
@@ -325,21 +322,15 @@ public class ModelCountingRanking {
 
 
     static BigInteger countModelsExact(Formula formula, int vars, int bound) throws IOException, InterruptedException {
-
         PreciseLTLModelCounter counter = new PreciseLTLModelCounter();
         Settings.MC_BOUND = bound;
-
-        BigInteger models = counter.count(formula, vars);
-        if (models == null)
-            return null;
-        return models;
+        return counter.count(formula, vars);
     }
 
     static BigInteger countExhaustivePrefixesRltl(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
         LabelledFormula form_lost = LabelledFormula.of(f, vars);
         CountRltlConv counter = new CountRltlConv();
-        BigInteger result = counter.countPrefixes(form_lost, bound);
-        return result;
+        return counter.countPrefixes(form_lost, bound);
     }
 
     static BigInteger countExhaustiveAutomataBasedPrefixes(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
@@ -356,14 +347,9 @@ public class ModelCountingRanking {
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write("0 0\n");
-//        for (int i = 0; i < result.size(); i++) {
-        BigInteger sol = result;
-//            bw.write(String.valueOf(i + 1));
         bw.write(" ");
-        bw.write(sol.toString());
+        bw.write(result.toString());
         bw.write("\n");
-//            System.out.println((i+1) + " " + sol);
-//        }
         bw.write(time + "\n");
         bw.flush();
         bw.close();
