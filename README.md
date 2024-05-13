@@ -93,6 +93,26 @@ This means that binary expressions take precedence over unary expressions, which
 Moreover, for chained binary expressions lacking parentheses, the rightmost binary operator holds precedence. For example, `a -> b U c` is parsed as `a -> (b U c)`.
 
 
+## 🛠️ Installation Instructions
+
+### REQUIREMENTS
+
+- Java 18 or later.
+
+### COMPILE ESTIMATE 
+To compile Estimate just run the following bash command.
+
+```bash
+make compile
+```
+Additionally, if you desire to get *jar* file together with the compilation run
+
+```bash
+make
+```
+
+This last rule will not only compile the whole project but also create a *jar* file (into the `dist` folder) you can use inside your projects.
+
 ## RUN ESTIMATE 🚀
 
 **The tool can take as input either a specification in TLSF format or directly an LTL formulae. To run, you have to use the script `modelcount.sh`.**
