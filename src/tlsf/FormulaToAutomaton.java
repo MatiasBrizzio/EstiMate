@@ -78,7 +78,6 @@ public class FormulaToAutomaton {
             else
                 setLabelEncoded(l);
         });
-//        System.out.println(labelIDs);
     }
 
     public <S> automata.Automaton formulaToDfa(LabelledFormula formula) {

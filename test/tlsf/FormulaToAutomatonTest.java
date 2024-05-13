@@ -26,7 +26,7 @@ public class FormulaToAutomatonTest {
 
     @Test
     public void testAutomataExamples() throws IOException, InterruptedException {
-        String filename = "examples/firefighting.tlsf";
+        String filename = "examples/simple.tlsf";
         Tlsf tlsf = TLSF_Utils.toBasicTLSF(new File(filename));
         List<String> vars = tlsf.variables();
         LabelledFormula f0 = tlsf.toFormula();
