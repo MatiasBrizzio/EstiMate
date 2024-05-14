@@ -1,13 +1,12 @@
 package main;
 
-import modelcounter.CountRltlConv;
-import modelcounter.MatrixBigIntegerModelCounting;
+import modelcounter.estimate.EmersonLeiAutomatonBasedModelCounting;
+import modelcounter.exact.PreciseLTLModelCounter;
+import modelcounter.re.CountRltlConv;
 import owl.ltl.Conjunction;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
-import owl.ltl.rewriter.NormalForms;
-import modelcounter.PreciseLTLModelCounter;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -35,33 +34,32 @@ public class PreciseModelCountingEvaluation {
         String filepath = null;
         boolean benchmarkusage = false;
         List<String> vars = new LinkedList<>();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("-b=")) {
-                String val = args[i].replace("-b=", "");
-                filepath = val;
+        for (String arg : args) {
+            if (arg.startsWith("-b=")) {
+                filepath = arg.replace("-b=", "");
                 benchmarkusage = true;
-            } else if (args[i].startsWith("-k=")) {
-                String val = args[i].replace("-k=", "");
+            } else if (arg.startsWith("-k=")) {
+                String val = arg.replace("-k=", "");
                 bound = Integer.parseInt(val);
-            } else if (args[i].startsWith("-vars=")) {
-                Collections.addAll(vars, args[i].replace("-vars=", "").split(","));
-            } else if (args[i].startsWith("-out=")) {
-                outname = args[i].replace("-out=", "");
-            } else if (args[i].startsWith("-cachet")) {
+            } else if (arg.startsWith("-vars=")) {
+                Collections.addAll(vars, arg.replace("-vars=", "").split(","));
+            } else if (arg.startsWith("-out=")) {
+                outname = arg.replace("-out=", "");
+            } else if (arg.startsWith("-cachet")) {
                 solver = 1;
-            } else if (args[i].startsWith("-ganak")) {
+            } else if (arg.startsWith("-ganak")) {
                 solver = 2;
-            } else if (args[i].startsWith("-re")) {
+            } else if (arg.startsWith("-re")) {
                 re_counting = true;
-            } else if (args[i].startsWith("-auto")) {
+            } else if (arg.startsWith("-auto")) {
                 automaton_counting = true;
-            } else if (args[i].startsWith("-ref=")) {
-                refinemets.add(args[i].replace("-ref=", ""));
-            } else if (args[i].startsWith("-ltl=")) {
-                formula = args[i].replace("-ltl=", "");
+            } else if (arg.startsWith("-ref=")) {
+                refinemets.add(arg.replace("-ref=", ""));
+            } else if (arg.startsWith("-ltl=")) {
+                formula = arg.replace("-ltl=", "");
             } else {
                 //assume that the argument with no flag is the formula
-                formula = args[i];
+                formula = arg;
             }
         }
 
@@ -190,19 +188,7 @@ public class PreciseModelCountingEvaluation {
                     k_values.add(null);
             }
 
-            SortedMap<BigInteger, List<Integer>> order = new TreeMap<>();
-            for (int i = 0; i < num_of_formulas; i++) {
-                if (timeout_formulas.contains(i))
-                    continue;
-                BigInteger key = k_values.get(i);
-                List<Integer> value;
-                if (order.containsKey(key))
-                    value = order.get(key);
-                else
-                    value = new LinkedList<>();
-                value.add(i);
-                order.put(key, value);
-            }
+            SortedMap<BigInteger, List<Integer>> order = getBigIntegerListSortedMap(num_of_formulas, timeout_formulas, k_values);
             ranking[k] = order;
             System.out.println((k + 1) + " " + order.values());
         }
@@ -284,6 +270,23 @@ public class PreciseModelCountingEvaluation {
             writeRanking(outname.replace(".out", "-ranking-by-formula.out"), formula_ranking_str.toString(), "");
             writeRanking(outname.replace(".out", "-ranking.out"), flatten_ranking_str.toString(), "");
         }
+    }
+
+    private static SortedMap<BigInteger, List<Integer>> getBigIntegerListSortedMap(int num_of_formulas, List<Integer> timeout_formulas, List<BigInteger> k_values) {
+        SortedMap<BigInteger, List<Integer>> order = new TreeMap<>();
+        for (int i = 0; i < num_of_formulas; i++) {
+            if (timeout_formulas.contains(i))
+                continue;
+            BigInteger key = k_values.get(i);
+            List<Integer> value;
+            if (order.containsKey(key))
+                value = order.get(key);
+            else
+                value = new LinkedList<>();
+            value.add(i);
+            order.put(key, value);
+        }
+        return order;
     }
 
     /**
@@ -436,26 +439,7 @@ public class PreciseModelCountingEvaluation {
 
 
     /**
-     * Gets formula.
-     *
-     * @param formula1  the formula 1
-     * @param formula2  the formula 2
-     * @param variables the variables
-     * @return the formula
-     */
-    static LabelledFormula getFormula(Formula formula1, Formula formula2, List<String> variables) {
-        LabelledFormula form;
-        if (formula2 == null)
-            form = LabelledFormula.of(formula1, variables);
-        else {
-            Formula cnf = NormalForms.toCnfFormula(Conjunction.of(formula1, formula2));
-            form = LabelledFormula.of(cnf, variables);
-        }
-        return form;
-    }
-
-    /**
-     * Count exhaustive prefixes rltl big integer.
+     * Count exhaustive prefixes using RE big integer.
      *
      * @param original the original
      * @param refined  the refined
@@ -490,16 +474,15 @@ public class PreciseModelCountingEvaluation {
      * @throws IOException          the io exception
      * @throws InterruptedException the interrupted exception
      */
-    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
-
+    static BigInteger countExhaustiveAutomataBasedPrefixes(Formula original, Formula refined, List<String> vars, int bound) {
         Formula conj_lost = Conjunction.of(original, refined.not());
         LabelledFormula form_lost = LabelledFormula.of(conj_lost, vars);
-        MatrixBigIntegerModelCounting counter = new MatrixBigIntegerModelCounting(form_lost, false);
+        EmersonLeiAutomatonBasedModelCounting counter = new EmersonLeiAutomatonBasedModelCounting<>(form_lost);
         BigInteger lostModels = counter.count(bound);
 
         Formula conj_won = Conjunction.of(original.not(), refined);
         LabelledFormula form_won = LabelledFormula.of(conj_won, vars);
-        MatrixBigIntegerModelCounting counter2 = new MatrixBigIntegerModelCounting(form_won, false);
+        EmersonLeiAutomatonBasedModelCounting counter2 = new EmersonLeiAutomatonBasedModelCounting<>(form_won);
         BigInteger wonModels = counter2.count(bound);
         BigInteger result = lostModels.add(wonModels);
         return result;

@@ -1,4 +1,4 @@
-package modelcounter;
+package modelcounter.re;
 
 import vlab.cs.ucsb.edu.DriverProxy;
 import vlab.cs.ucsb.edu.DriverProxy.Option;

@@ -1,7 +1,6 @@
-package main;
+package helpers;
 
-import modelcounter.ABC;
-import modelcounter.Rltlconv_LTLModelCounter;
+import modelcounter.re.ABC;
 import regular.Discretizer;
 
 import java.io.IOException;
@@ -16,13 +15,13 @@ public class CountMain {
             throw new RuntimeException("CountMain.main: it takes the formula and the bound as input: " + args.length);
         String ltl = args[0];
         int bound = Integer.parseInt(args[1]);
-        Rltlconv_LTLModelCounter translatorLTLtoRE = new Rltlconv_LTLModelCounter();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         String abcRE = translatorLTLtoRE.ltl2RE(ltl);
         String[] arr = Discretizer.or(abcRE);
         BigInteger result = BigInteger.ZERO;
         for (String string : arr) {
             LinkedList<String> abcStrs = new LinkedList<>();
-            String s = translatorLTLtoRE.toABClanguage(string);
+            String s = TranslatorLTL2RE.toABClanguage(string);
             abcStrs.add(s);
             ABC abc = new ABC();
             BigInteger count = abc.count(abcStrs, bound, false, true);

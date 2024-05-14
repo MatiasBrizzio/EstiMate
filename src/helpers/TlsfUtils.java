@@ -1,6 +1,8 @@
 package helpers;
 
-import owl.ltl.*;
+import owl.ltl.BooleanConstant;
+import owl.ltl.Formula;
+import owl.ltl.LabelledFormula;
 import owl.ltl.parser.TlsfParser;
 import owl.ltl.tlsf.Tlsf;
 import owl.ltl.tlsf.Tlsf.Semantics;

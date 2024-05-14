@@ -1,9 +1,10 @@
-package modelcounter;
+package modelcounter.estimate;
 
 import gov.nasa.ltl.graph.Edge;
 import gov.nasa.ltl.graph.Graph;
 import gov.nasa.ltl.graph.Node;
 import gov.nasa.ltl.graphio.Writer;
+import helpers.Buchi2Graph;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
 import org.apache.commons.math3.linear.FieldMatrix;

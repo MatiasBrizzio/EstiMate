@@ -1,4 +1,4 @@
-package modelcounter;
+package modelcounter.exact;
 
 import main.Settings;
 import owl.ltl.Formula;

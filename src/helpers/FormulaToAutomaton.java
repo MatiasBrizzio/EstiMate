@@ -1,6 +1,8 @@
 package helpers;
 
-import automata.fsa.*;
+import automata.fsa.FSAToRegularExpressionConverter;
+import automata.fsa.FSATransition;
+import automata.fsa.FiniteStateAutomaton;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;

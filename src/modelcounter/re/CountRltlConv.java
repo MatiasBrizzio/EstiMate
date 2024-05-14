@@ -1,8 +1,8 @@
-package modelcounter;
+package modelcounter.re;
 
+import helpers.SolverUtils;
 import main.Settings;
 import owl.ltl.LabelledFormula;
-import helpers.SolverUtils;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -12,11 +12,10 @@ import java.util.concurrent.TimeUnit;
 public class CountRltlConv {
     public BigInteger countPrefixes(LabelledFormula formula, int bound) throws IOException, InterruptedException {
         String ltlStr = genRltlString(formula);
-        BigInteger result = runCount(ltlStr, bound);
-        return result;
+        return runCount(ltlStr, bound);
     }
 
-    public String genRltlString(LabelledFormula formula) throws IOException, InterruptedException {
+    public String genRltlString(LabelledFormula formula) {
         List<String> alphabet = SolverUtils.genAlphabet(formula.variables().size());
         LabelledFormula label_formula = LabelledFormula.of(formula.formula(), alphabet);
         String ltl = SolverUtils.toLambConvSyntax(label_formula.toString());
@@ -55,7 +54,6 @@ public class CountRltlConv {
         OutputStream os = p.getOutputStream();
         if (os != null) os.close();
         p.destroy();
-        BigInteger result = new BigInteger(out);
-        return result;
+        return new BigInteger(out);
     }
 }

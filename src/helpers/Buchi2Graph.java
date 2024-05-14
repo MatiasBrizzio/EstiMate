@@ -1,10 +1,9 @@
-package modelcounter;
+package helpers;
 
 import automata.State;
 import automata.Transition;
 import gov.nasa.ltl.graph.*;
 import owl.ltl.LabelledFormula;
-import helpers.FormulaToAutomaton;
 
 import java.io.IOException;
 

@@ -1,14 +1,14 @@
 package main;
 
 import helpers.FormulaUtils;
-import modelcounter.CountRltlConv;
-import modelcounter.EmersonLeiAutomatonBasedModelCounting;
+import helpers.TlsfUtils;
+import modelcounter.estimate.EmersonLeiAutomatonBasedModelCounting;
+import modelcounter.exact.PreciseLTLModelCounter;
+import modelcounter.re.CountRltlConv;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.tlsf.Tlsf;
-import modelcounter.PreciseLTLModelCounter;
-import helpers.TlsfUtils;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -16,6 +16,7 @@ import java.util.*;
 
 public class Main {
     static String solver = "";
+
     public static void main(String[] args) throws IOException, InterruptedException {
         String outname = null;
         Formula form;

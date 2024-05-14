@@ -1,10 +1,10 @@
-package modelcounter;
+package modelcounter.estimate;
 
 
+import helpers.FormulaUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import jhoafparser.ast.AtomAcceptance;
 import jhoafparser.ast.BooleanExpression;
-import helpers.FormulaUtils;
 import main.Settings;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.linear.Array2DRowFieldMatrix;

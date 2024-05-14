@@ -1,5 +1,6 @@
 package modelcounter;
 
+import modelcounter.re.CountRltlConv;
 import org.junit.jupiter.api.Test;
 import owl.ltl.Conjunction;
 import owl.ltl.Formula;

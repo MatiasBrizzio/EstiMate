@@ -1,6 +1,8 @@
 package helpers;
 
-import owl.ltl.*;
+import owl.ltl.BooleanConstant;
+import owl.ltl.Conjunction;
+import owl.ltl.Formula;
 
 import java.util.HashSet;
 import java.util.LinkedList;

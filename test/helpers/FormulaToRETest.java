@@ -18,17 +18,17 @@ public class FormulaToRETest {
         List<String> vars = List.of("a", "b");
         LabelledFormula f0 = LtlParser.parse("false", vars);
         System.out.println(f0);
-        FormulaToRE translatorLTLtoRE = new FormulaToRE();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         String re = translatorLTLtoRE.formulaToRegularExpression(f0);
         System.out.println(re);
     }
 
     @Test
-    public void testSimple1() {
+    public void testSimple1() throws IOException, InterruptedException {
         List<String> vars = List.of("a", "b");
         LabelledFormula f0 = LtlParser.parse("G(a -> F(b))", vars);
         System.out.println(f0);
-        FormulaToRE translatorLTLtoRE = new FormulaToRE();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         translatorLTLtoRE.generateLabels(f0.variables());
         String re = translatorLTLtoRE.formulaToRegularExpression(f0);
         System.out.println(re);
@@ -39,21 +39,23 @@ public class FormulaToRETest {
         List<String> vars = List.of("a", "b");
         LabelledFormula f0 = LtlParser.parse("G(a -> X(b))", vars);
         System.out.println(f0);
-        FormulaToRE translatorLTLtoRE = new FormulaToRE();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         translatorLTLtoRE.generateLabels(f0.variables());
         String re = translatorLTLtoRE.formulaToRegularExpression(f0);
         System.out.println(re);
     }
 
     @Test
-    public void testSimple3() {
+    public void testSimple3() throws IOException, InterruptedException {
         List<String> vars = List.of("a", "b");
         LabelledFormula f0 = LtlParser.parse("G(a -> (b))", vars);
         System.out.println(f0);
-        FormulaToRE translatorLTLtoRE = new FormulaToRE();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         translatorLTLtoRE.generateLabels(f0.variables());
         String re = translatorLTLtoRE.formulaToRegularExpression(f0);
         System.out.println(re);
+        TranslatorLTL2RE translatorLTLtoRE2 = new TranslatorLTL2RE();
+        System.out.println(translatorLTLtoRE2.ltl2RE("LTL=!a || b"));
     }
 
     @Test
@@ -66,7 +68,7 @@ public class FormulaToRETest {
         Formula simplified = orig.formula().accept(simp);
         LabelledFormula f0 = LabelledFormula.of(simplified, vars);
         System.out.println(f0);
-        FormulaToRE translatorLTLtoRE = new FormulaToRE();
+        TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
         translatorLTLtoRE.generateLabels(vars);
         String re = translatorLTLtoRE.formulaToRegularExpression(f0);
         System.out.println(re);

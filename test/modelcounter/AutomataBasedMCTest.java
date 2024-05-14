@@ -1,6 +1,7 @@
 package modelcounter;
 
 import gov.nasa.ltl.trans.ParseErrorException;
+import modelcounter.estimate.AutomataBasedModelCounting;
 import org.junit.Test;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;

@@ -1,6 +1,7 @@
 package modelcounter;
 
 import helpers.TlsfUtils;
+import modelcounter.re.CountREModels;
 import org.junit.jupiter.api.Test;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
@@ -34,8 +35,6 @@ class CountREModelsTest {
         list.add(f0);
         System.out.println(f0);
         CountREModels counter = new CountREModels();
-//		        String re = counter.genABCString(f0);
-//		        System.out.println(re);
         BigInteger c = counter.count(list, 10, false, true);
         System.out.println(c);
     }

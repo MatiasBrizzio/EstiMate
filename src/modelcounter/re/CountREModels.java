@@ -1,7 +1,7 @@
-package modelcounter;
+package modelcounter.re;
 
+import helpers.TranslatorLTL2RE;
 import owl.ltl.LabelledFormula;
-import helpers.FormulaToRE;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -10,10 +10,10 @@ import java.util.List;
 
 
 public class CountREModels {
-    FormulaToRE translatorLTLtoRE;
+    TranslatorLTL2RE translatorLTLtoRE;
 
     public CountREModels() {
-        translatorLTLtoRE = new FormulaToRE();
+        translatorLTLtoRE = new TranslatorLTL2RE();
     }
 
     public BigInteger count(List<LabelledFormula> formulas, int bound, boolean exhaustive, boolean positive) throws IOException, InterruptedException {
@@ -39,7 +39,7 @@ public class CountREModels {
         }
     }
 
-    public String genABCString(LabelledFormula ltl) throws IOException, InterruptedException {
+    public String genABCString(LabelledFormula ltl) {
 //		translatorLTLtoRE = new FormulaToRE();
         int vars = ltl.variables().size();
         if (vars > 5 && vars < 12)
@@ -50,13 +50,6 @@ public class CountREModels {
         String s = translatorLTLtoRE.formulaToRegularExpression(ltl);
         if (s == null)
             return null;
-        return toABClanguage(s);
-    }
-
-    public String toABClanguage(String re) {
-        String abcStr;
-        abcStr = re.replace("λ", "\"\"");
-        abcStr = abcStr.replace("+", "|");
-        return abcStr;
+        return TranslatorLTL2RE.toABClanguage(s);
     }
 }
