@@ -2,7 +2,7 @@ package main;
 
 import modelcounter.estimate.EmersonLeiAutomatonBasedModelCounting;
 import modelcounter.exact.PreciseLTLModelCounter;
-import modelcounter.re.CountRltlConv;
+import modelcounter.re.CountREModels;
 import owl.ltl.Conjunction;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
@@ -452,12 +452,12 @@ public class PreciseModelCountingEvaluation {
     static BigInteger countExhaustivePrefixesRltl(Formula original, Formula refined, List<String> vars, int bound) throws IOException, InterruptedException {
         Formula conj_lost = Conjunction.of(original, refined.not());
         LabelledFormula form_lost = LabelledFormula.of(conj_lost, vars);
-        CountRltlConv counter = new CountRltlConv();
+        CountREModels counter = new CountREModels();
         BigInteger lostModels = counter.countPrefixes(form_lost, bound);
 
         Formula conj_won = Conjunction.of(original.not(), refined);
         LabelledFormula form_won = LabelledFormula.of(conj_won, vars);
-        CountRltlConv counter2 = new CountRltlConv();
+        CountREModels counter2 = new CountREModels();
         BigInteger wonModels = counter2.countPrefixes(form_won, bound);
         BigInteger result = lostModels.add(wonModels);
         return result;

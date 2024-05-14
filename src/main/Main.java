@@ -4,7 +4,7 @@ import helpers.FormulaUtils;
 import helpers.TlsfUtils;
 import modelcounter.estimate.EmersonLeiAutomatonBasedModelCounting;
 import modelcounter.exact.PreciseLTLModelCounter;
-import modelcounter.re.CountRltlConv;
+import modelcounter.re.CountREModels;
 import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
@@ -338,7 +338,7 @@ public class Main {
 
     static BigInteger countExhaustivePrefixesRltl(Formula f, List<String> vars, int bound) throws IOException, InterruptedException {
         LabelledFormula form_lost = LabelledFormula.of(f, vars);
-        CountRltlConv counter = new CountRltlConv();
+        CountREModels counter = new CountREModels();
         return counter.countPrefixes(form_lost, bound);
     }
 

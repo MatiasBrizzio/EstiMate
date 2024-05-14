@@ -8,7 +8,7 @@ import owl.ltl.LabelledFormula;
 import java.io.IOException;
 
 public class Buchi2Graph {
-    public static Graph<String> LTL2Graph(LabelledFormula formula) throws IOException, InterruptedException {
+    public static Graph<String> LTL2Graph(LabelledFormula formula) {
         FormulaToAutomaton translator = new FormulaToAutomaton();
         translator.generateLabels(formula.variables());
         automata.Automaton dfa = translator.formulaToDfa(formula);

@@ -395,4 +395,17 @@ public class TranslatorLTL2RE {
         }
     }
 
+    public String genABCString(LabelledFormula ltl) {
+        int vars = ltl.variables().size();
+        if (vars > 5 && vars < 12)
+            encoded_alphabet = 0;
+        else if (vars >= 12)
+            encoded_alphabet = 1;
+        generateLabels(ltl.variables());
+        String s = formulaToRegularExpression(ltl);
+        if (s == null)
+            return null;
+        return TranslatorLTL2RE.toABClanguage(s);
+    }
+
 }
