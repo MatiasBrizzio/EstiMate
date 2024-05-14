@@ -1,2 +1,2 @@
 #!/bin/bash
-java -Xmx8g -Djava.library.path=/usr/local/lib -cp bin/.:lib/* main.CountMain "$@"
+java -Xmx8g -Djava.library.path=/usr/local/lib -cp bin/.:lib/* helpers.CountMain "$@"
