@@ -21,7 +21,7 @@ public class CountMain {
         BigInteger result = BigInteger.ZERO;
         for (String string : arr) {
             LinkedList<String> abcStrs = new LinkedList<>();
-            String s = TranslatorLTL2RE.toABClanguage(string);
+            String s = translatorLTLtoRE.toABClanguage(string);
             abcStrs.add(s);
             ABC abc = new ABC();
             BigInteger count = abc.count(abcStrs, bound, false, true);

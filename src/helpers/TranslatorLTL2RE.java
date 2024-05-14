@@ -55,7 +55,7 @@ public class TranslatorLTL2RE {
         alphabetSize = 0;
     }
 
-    public static String toABClanguage(String re) {
+    public String toABClanguage(String re) {
         String abcStr;
         abcStr = re.replace("λ", "\"\"");
         abcStr = abcStr.replace("+", "|");
@@ -405,7 +405,7 @@ public class TranslatorLTL2RE {
         String s = formulaToRegularExpression(ltl);
         if (s == null)
             return null;
-        return TranslatorLTL2RE.toABClanguage(s);
+        return toABClanguage(s);
     }
 
 }
