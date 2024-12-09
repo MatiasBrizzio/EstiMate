@@ -142,4 +142,4 @@ Thanks for taking an interest in EstiMate! 🦉
 Happy coding and may your projects soar to new heights! 🚀
 
 ## Publications Using EstiMate
-EstiMate has recently been employed to resolve conflicts within complex real-world LTL specifications [[1]](https://rdcu.be/dIdOr). Additionally, it has been utilized to detect bugs in some of the most commonly used SAT solvers [[2]](https://dl.acm.org/doi/abs/10.1145/3597503.3639087) within the SE and formal methods communities
+EstiMate has recently been employed to resolve conflicts within complex real-world LTL specifications [[1]](https://rdcu.be/dIdOr), additionally, this idea was used in [[2]](https://arxiv.org/pdf/2211.11908) to measure the distance between assume-guarantee contracts. Additionally, it has been utilized to detect bugs in some of the most commonly used SAT solvers [[3]](https://dl.acm.org/doi/abs/10.1145/3597503.3639087) within the SE and formal methods communities
