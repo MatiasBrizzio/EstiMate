@@ -23,7 +23,7 @@ public class PreciseModelCountingEvaluation {
      * @throws IOException          the io exception
      * @throws InterruptedException the interrupted exception
      */
-    public static void main(String[] args) throws IOException, InterruptedException {
+    static void run(String[] args) throws IOException, InterruptedException {
         String formula = null;
         List<String> refinemets = new LinkedList<>();
         String outname = null;

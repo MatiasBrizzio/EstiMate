@@ -31,7 +31,7 @@ BIN_DIR = bin
 DIST_DIR = dist
 
 # Main class (replace 'Main' with the name of your main class)
-MAIN_CLASS = ModelCountingRanking
+MAIN_CLASS = main.Main
 
 # Source files
 SOURCES = $(wildcard $(SRC_DIR)/*.java)

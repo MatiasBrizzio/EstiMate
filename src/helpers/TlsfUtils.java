@@ -14,7 +14,7 @@ import java.util.List;
 public class TlsfUtils {
     private static String getCommand() {
         String osName = System.getProperty("os.name").toLowerCase();
-        return osName.contains("mac") ? "syfco" : "./lib/syfco";
+        return osName.contains("mac") ? "./lib/syfco_macos" : "./lib/syfco";
     }
 
     private static int getExitCode(String cmd) throws IOException, InterruptedException {
@@ -33,33 +33,11 @@ public class TlsfUtils {
         return exitCode == 0;
     }
 
-    private static boolean isBasic(File spec) throws IOException, InterruptedException {
-        List<String> cmdList = new ArrayList<>();
-        cmdList.add(getCommand());
-        cmdList.add("-p");
-        cmdList.add(spec.getPath());
-
-        ProcessBuilder processBuilder = new ProcessBuilder(cmdList);
-        Process pr = processBuilder.start();
-
-        if (pr.waitFor() == 1) {
-            return false;
-        }
-
-        try (InputStream in = pr.getInputStream();
-             InputStreamReader inread = new InputStreamReader(in);
-             BufferedReader bufferedreader = new BufferedReader(inread)) {
-            String aux = bufferedreader.readLine();
-            return aux != null && aux.isEmpty();
-        }
-    }
-
     public static Tlsf toBasicTLSF(File spec) throws IOException, InterruptedException {
-        if (hasSyfcoSyntax(spec)) {
-            if (isBasic(spec)) {
-                return TlsfParser.parse(new FileReader(spec));
-            }
-        } else {
+        // Every file goes through syfco, basic ones included. Owl's parser gives `->` a
+        // different precedence than syfco, so a basic file handed to Owl as written can be
+        // read as another formula. syfco -m fully prints every operand parenthesised.
+        if (!hasSyfcoSyntax(spec)) {
             String tlsfAdapted = adaptTLSFSpec(TlsfParser.parse(new FileReader(spec)));
             try (FileWriter fileWriter2 = new FileWriter(spec)) {
                 fileWriter2.write(tlsfAdapted);
@@ -68,7 +46,7 @@ public class TlsfUtils {
 
         String cmd = getCommand();
         String tlsfBasic = spec.getAbsolutePath().replace(".tlsf", "_basic.tlsf");
-        cmd += " -o " + tlsfBasic + " -f basic -m pretty -s0 " + spec.getAbsolutePath();
+        cmd += " -o " + tlsfBasic + " -f basic -m fully -s0 " + spec.getAbsolutePath();
 
         int exitCode = getExitCode(cmd);
 

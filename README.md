@@ -1,10 +1,167 @@
 # EstiMate 🦉
 
-EstiMate is an approximate model counter, designed to estimate the number of models for a given LTL formula. It utilizes a transfer matrix, generated through a series of tree encodings, to provide approximate model counts.
+EstiMate estimates how many traces of a given length satisfy an LTL formula. It builds the formula's automaton, encodes it as a transfer matrix, and counts with one matrix power, so it stays fast on formulas where exact counting is expensive.
 
-#### Acknowledgments 🌟
+Use it when you need to compare LTL specifications by how much they allow: for ranking formulas, measuring how far apart two specifications are, or guiding a search. The same counter also ships inside [AuRUS](https://github.com/MatiasBrizzio/AuRUS), for people already using that tool.
 
-If you utilize EstiMate for research purposes, we kindly request that you cite the corresponding paper where the technique was introduced and evaluated: [Automated Repair of Unrealisable LTL Specifications Guided by Model Counting.](https://dl.acm.org/doi/10.1145/3583131.3590454) Thank you :)
+## Quick start 🚀
+
+Requires **Java 18 or later** and [Apache Ant](https://ant.apache.org/). The other libraries and the default solver are in `lib/`.
+
+```bash
+make compile
+./modelcount.sh -k=10 -vars=a,b 'G (a -> X b)'
+# {"status":"ok","count":"78732","ms":210}
+```
+
+To also build a jar in `dist/`, run `make`.
+
+## Counting models 🔢
+
+`modelcount.sh` is the only command. Give it a formula or a TLSF file. It prints one line of JSON, or just the number with `-c`:
+
+```bash
+./modelcount.sh -k=10 -vars=a,b 'G (a -> X b)'
+./modelcount.sh -k=10 examples/arbiter.tlsf
+./modelcount.sh -c -k=10 -vars=a,b 'G (a -> X b)'
+# 78732
+```
+
+`status` is one of:
+
+| Status | Meaning | Exit code |
+| --- | --- | --- |
+| `ok` | The count is in `count` | 0 |
+| `unsat_simplified` | Unsatisfiable, found by the simplifier; `count` is 0 | 0 |
+| `unsat_solver` | Unsatisfiable, proven by the solver; `count` is 0 | 0 |
+| `timeout` | A translation, counting or solver timeout | 1 |
+| `error` | A solver or internal failure | 1 |
+
+A failure never carries a count. With `-c`, standard output stays empty on a failure. Bad usage exits with code 2.
+
+| Option | Meaning |
+| --- | --- |
+| `-k=N` | Word length (default 10) |
+| `-vars=a,b` | Declared propositions; default: those in the formula. Not allowed with TLSF files |
+| `-sat=NAME` | Satisfiability solver: `aalta` (default) or `black` |
+| `-sat-bin=PATH` | Override the solver binary |
+| `--timeout=S` | Translation and counting timeouts, in seconds |
+| `--dump` | Add the automaton to the JSON (up to 10 propositions) |
+| `-c`, `-count` | Print only the number |
+| `--det` | Repeatable counts between runs. Experimental: see [Repeatable counts](#repeatable-counts) |
+
+### Older options
+
+These keep the original behaviour, which prints the number on its own (`timeout` if the count failed). With a file, they also print a ranking and write the results to `result/`.
+
+| Option | Meaning |
+| --- | --- |
+| `-formula=F` | The formula to count |
+| `-to=S` | Counting timeout, in seconds |
+| `-out=FILE` | Where to write the results for a file of formulas |
+| `-re` | Use the regular-expression counter |
+| `-exact`, `-exact=NAME` | Use the exact counter, with `relsat` (default), `cachet` or `miniC2D` |
+
+### From Java
+
+```java
+LabelledFormula formula = LtlParser.parse("G (a -> X b)", List.of("a", "b"));
+CountResult result = ModelCounter.count(formula, 10);
+if (!result.isFailure()) {
+    System.out.println(result.count());
+}
+```
+
+`ModelCounter` is in `modelcounter.estimate`. `CountResult` holds a count, a proof of unsatisfiability, or a failure, and `count()` throws on a failure.
+
+## What the number means 🤔
+
+EstiMate counts the **words of length `k` whose run ends in a successor of an accepting edge**. This is an approximation of the number of satisfying traces, and it depends on the automaton: two equivalent formulas can get different counts. On a few formulas the count can also change between runs of the same program (4 of 10000 random formulas in our fuzzing). See [Repeatable counts](#repeatable-counts).
+
+| Formula, with `-vars=a,b` and `-k=10` | Count |
+| --- | --- |
+| `G a` | 1024 |
+| `G a & F b` | 1023 |
+| `G (a -> X b)` | 78732 |
+| `G (a -> X b) & G (a -> F b)` (equivalent to the previous one) | 65610 |
+| `G (a -> X b) & !G (a -> F b)` (unsatisfiable) | 0 |
+
+**Unsatisfiable formulas count 0.** The formula is simplified and then checked with a satisfiability solver before counting. Only a conclusive answer gives 0: a solver timeout, an error, an empty answer or `UNKNOWN` is reported as a failure.
+
+**Declared propositions change the number.** They set the alphabet, so each proposition declared but not used multiplies the count by `2^k`. `G a` counts 1 with `-vars=a` and 1024 with `-vars=a,b`.
+
+**Cost grows with the alphabet.** Counting visits every letter of the alphabet, so it takes time proportional to `2^n` for `n` declared propositions, and declaring unused ones is expensive.
+
+## Satisfiability solvers ⚙️
+
+| | aalta | BLACK |
+| --- | --- | --- |
+| Installation | Included in `lib/` | Separate: `brew install black-sat/black/black-sat`, or the packages on its [releases page](https://github.com/black-sat/black/releases). Tested with 26.05.0 |
+| Simultaneous runs in one directory | **Not safe**: it uses a work file in its current directory, and runs interfere and give wrong answers | Safe |
+
+Use `-sat=black` when several runs execute at once in the same directory.
+
+## Repeatable counts <a name="repeatable-counts" /> 🎯
+
+Without `--det`, a few formulas can get a different count on each run, because Java randomises the order of some collections at startup and Owl's translation depends on that order. `--det` fixes that order so that repeated runs agree:
+
+```bash
+./modelcount.sh --det -k=10 -vars=a,b 'G (a -> X b)'
+```
+
+**`--det` is experimental.** It writes private JDK fields and uses an experimental JVM flag, so it may stop working on other Java versions. It has only been tested on OpenJDK 27.0.1 on macOS. If it cannot be applied on your JVM, the run fails with an error instead of continuing without repeatable results. It makes runs agree with each other, but the count it gives is one of the possible values, not a more correct one.
+
+The measurements, the formulas that vary and the reasons are in [docs/non-determinism.md](docs/non-determinism.md).
+
+## Comparing configurations 🧪
+
+`fuzz-compare.sh` counts the same seeded random formulas with every available configuration and reports any disagreement. It compares aalta with BLACK when BLACK is installed, and EstiMate with AuRUS when you pass `-aurus`.
+
+```bash
+./fuzz-compare.sh -n=5000 -seed=1 -timeout=10 -aurus=../AuRUS
+```
+
+With `-repeat` it runs EstiMate twice instead, to measure variation between runs, and `--det` applies repeatable counts to both runs. Formulas on which a run timed out or failed are reported as skipped. The script exits with a non-zero code if any two configurations disagree. Compile EstiMate, and AuRUS if you use it, first.
+
+## How it works 🔄
+
+1. The formula is translated into a deterministic automaton with an Emerson-Lei acceptance condition, using Owl.
+2. The automaton is encoded as an N x N transfer matrix T, where N is the number of states and T[i,j] is the number of letters that go from state i to state j.
+3. The count is I x T<sup>k</sup> x F, where I marks the initial states and F marks the states reached by an accepting edge.
+
+The automaton accepts infinite traces, so step 3 looks at finite prefixes of them. A prefix can end in a marked state even if no continuation satisfies the formula, which is why the result is an approximation.
+
+## LTL syntax <a name="LTL" /> 🕰️
+
+The grammar follows Spot-style LTL. For the semantics of temporal logic, see [here](https://spot.lrde.epita.fr/tl.pdf).
+
+| Propositional | Syntax |
+| --- | --- |
+| True | `tt`, `true`, `1` |
+| False | `ff`, `false`, `0` |
+| Atom | `[a-zA-Z_][a-zA-Z_0-9]*` or quoted `"[^"]+"` |
+| Negation | `!`, `NOT` |
+| Implication | `->`, `=>`, `IMP` |
+| Bi-implication | `<->`, `<=>`, `BIIMP` |
+| Exclusive disjunction | `^`, `XOR` |
+| Conjunction | `&&`, `&`, `AND` |
+| Disjunction | `\|\|`, `\|`, `OR` |
+
+| Temporal | Syntax |
+| --- | --- |
+| Finally | `F` |
+| Globally | `G` |
+| Next | `X` |
+| (Strong) until | `U` |
+| Weak until | `W` |
+| (Weak) release | `R` |
+| Strong release | `M` |
+
+From loosest to tightest, operators bind as `OR`, `AND`, the other binary operators, then the unary ones. So `a && b || c` is `(a && b) || c`. Chained binary operators without parentheses group to the right: `a -> b U c` is `a -> (b U c)`. Use parentheses when in doubt.
+
+## Citing EstiMate 🌟
+
+If you use EstiMate for research, please cite the paper where the technique was introduced and evaluated: [Automated Repair of Unrealisable LTL Specifications Guided by Model Counting](https://dl.acm.org/doi/10.1145/3583131.3590454).
 
 ```
 @inproceedings{10.1145/3583131.3590454,
@@ -25,121 +182,10 @@ series = {GECCO '23}
 }
 ```
 
+### Publications using EstiMate
+
+EstiMate has been used to resolve conflicts within complex real-world LTL specifications [[1]](https://rdcu.be/dIdOr), to measure the distance between assume-guarantee contracts [[2]](https://arxiv.org/pdf/2211.11908), and to detect bugs in some of the most commonly used SAT solvers [[3]](https://dl.acm.org/doi/abs/10.1145/3597503.3639087).
 
 ## Maintainers 👨‍💻
 
-This code is implemented and maintained by [Matias Brizzio](mailto:matias.brizzio@imdea.org?subject=[GitHub]%20Source%20EstiMate) and [Renzo Degiovanni](https://rdegiovanni.github.io)
-
-## Transfer Matrix Generation 🔄
-
-The transfer matrix, denoted as T<sub>ϕ</sub>, is generated using the following steps:
-
-1. Generate the Buchi automaton B<sub>ϕ</sub> that recognizes the specification ϕ.
-2. From B<sub>ϕ</sub>, generate a Finite State Automaton A<sub>ϕ</sub>.
-3. Generate the transfer matrix T<sub>ϕ</sub> from A<sub>ϕ</sub>.
-
-## Understanding the Process 🤔
-The Buchi automaton B<sub>ϕ</sub> recognizes lasso traces satisfying the formula ϕ. A lasso trace is an infinite trace that loops back to a previous state, forming a cycle. It accepts infinite traces, as its accepting condition requires visiting an accepting state infinitely often in the lasso trace. In contrast, finite automata recognize finite traces, as their accepting condition only requires reaching a final state.
-
-When generating the finite automaton A<sub>ϕ</sub> from B<sub>ϕ</sub>, the finite traces recognized by A<sub>ϕ</sub> become part of the lasso traces recognized by B<sub>ϕ</sub>.
-
-The finite automaton A<sub>ϕ</sub> is encoded into an N x N transfer matrix T<sub>ϕ</sub>, where N represents the number of states in A<sub>ϕ</sub>. Each element T<sub>ϕ</sub>[i,j] in the matrix denotes the number of transitions from state i to state j.
-
-By using matrix multiplication, the number of traces of length k accepted by A<sub>ϕ</sub> can be computed as I x T<sub>ϕ</sub><sup>k</sup> x F. Here, I is a row vector representing the initial states, T<sub>ϕ</sub><sup>k</sup> is the matrix resulting from multiplying T<sub>ϕ</sub> k times, and F is a column vector representing the final states of A<sub>ϕ</sub>.
-
-## Linear Temporal Logic (LTL) <a name="LTL" /> 🕰️
-
-The grammar for LTL aims to support Spot-style LTL. For further details on temporal logic, e.g., semantics, see [here](https://spot.lrde.epita.fr/tl.pdf).
-
-### Propositional Logic ✔️
-
-* True: `tt`, `true`, `1`
-* False: `ff`, `false`, `0`
-* Atom: `[a-zA-Z_][a-zA-Z_0-9]*` or quoted `"[^"]+"`
-* Negation: `!`, `NOT`
-* Implication: `->`, `=>`, `IMP`
-* Bi-implication: `<->`, `<=>`, `BIIMP`
-* Exclusive Disjunction: `^`, `XOR`
-* Conjunction: `&&`, `&`, `AND`
-* Disjunction: `||`, `|`, `OR`
-* Parenthesis: `(`, `)`
-
-### Modal Logic 🚪
-
-* Finally: `F`
-* Globally: `G`
-* Next: `X`
-* (Strong) Until: `U`
-* Weak Until: `W`
-* (Weak) Release: `R`
-* Strong Release: `M`
-
-### Precedence Rules 📜
-
-To ensure the accurate interpretation of provided LTL formulas, the parser adheres to the following precedence rules:
-
-- **Binary Expressions**: These expressions involve two operands and an operator. Examples include conjunction (`&&`, `&`, `AND`), disjunction (`||`, `|`, `OR`), implication (`->`, `=>`, `IMP`), bi-implication (`<->`, `<=>`, `BIIMP`), exclusive disjunction (`^`, `XOR`), strong until (`U`), weak until (`W`), weak release (`R`), and strong release (`M`).
-
-- **Unary Expressions**: These expressions involve a single operand and an operator. Examples include negation (`!`, `NOT`), next (`X`), globally (`G`), and finally (`F`).
-
-- **Literals, Constants, Parentheses**: These are fundamental components of the formula. Literals represent atomic propositions, constants denote truth values (e.g., `tt` for true, `ff` for false), and parentheses are used to group subexpressions.
-
-The precedence hierarchy is structured as follows:
-
-`OR` < `AND` < `Binary Expressions` < `Unary Expressions` < `Literals`, `Constants`, `Parentheses`
-
-This means that binary expressions take precedence over unary expressions, which, in turn, take precedence over literals, constants, and parentheses. For instance, in the expression `a && b || c`, the conjunction (`&&`) is evaluated before the disjunction (`||`), and parentheses can be employed to override this precedence.
-
-Moreover, for chained binary expressions lacking parentheses, the rightmost binary operator holds precedence. For example, `a -> b U c` is parsed as `a -> (b U c)`.
-
-
-## 🛠️ Installation Instructions
-
-### REQUIREMENTS
-
-- Java 18 or later.
-
-### COMPILE ESTIMATE 
-To compile Estimate just run the following bash command.
-
-```bash
-make compile
-```
-Additionally, if you desire to get *jar* file together with the compilation run
-
-```bash
-make
-```
-
-This last rule will not only compile the whole project but also create a *jar* file (into the `dist` folder) you can use inside your projects.
-
-## RUN ESTIMATE 🚀
-
-**The tool can take as input either a specification in TLSF format or directly an LTL formulae. To run, you have to use the script `modelcount.sh`.**
-
-```bash
-./modelcount.sh case-studies/arbiter/arbiter.tlsf 
-```
-
-or:
-
-```
-./modelcount.sh -formula="(F (a && p))" -k=10 -vars=a,p [-flags] [-to=timeout]
-```
-
-### Flags 🚩
- * `-auto = enables EstiMate`
- * `-re = uses a Regular expression model counter`
- * `without flag; uses exact model counter`
-
-
-## Contact Us 📧
-
-This README is here to give you a complete rundown of EstiMate, covering its features and how to use it effectively. If you have any questions or come across any roadblocks, don't hesitate to get in touch with us.
-
-Thanks for taking an interest in EstiMate! 🦉
-
-Happy coding and may your projects soar to new heights! 🚀
-
-## Publications Using EstiMate
-EstiMate has recently been employed to resolve conflicts within complex real-world LTL specifications [[1]](https://rdcu.be/dIdOr), additionally, this idea was used in [[2]](https://arxiv.org/pdf/2211.11908) to measure the distance between assume-guarantee contracts. Additionally, it has been utilized to detect bugs in some of the most commonly used SAT solvers [[3]](https://dl.acm.org/doi/abs/10.1145/3597503.3639087) within the SE and formal methods communities
+EstiMate is implemented and maintained by [Matias Brizzio](mailto:matias.brizzio@imdea.org?subject=[GitHub]%20Source%20EstiMate). If you have questions or run into problems, get in touch.

@@ -33,8 +33,8 @@ public class SolverSyntaxOperatorReplacer implements Visitor<Formula> {
 
     @Override
     public Formula visit(FOperator fOperator) {
-        Formula operand = fOperator.operand;
-        return UOperator.of(BooleanConstant.TRUE, operand);
+        Formula operand = fOperator.operand.accept(this);
+        return FOperator.of(operand);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class SolverSyntaxOperatorReplacer implements Visitor<Formula> {
 
     @Override
     public Formula visit(GOperator gOperator) {
-        Formula operand = gOperator.operand;
-        return UOperator.of(BooleanConstant.TRUE, operand.not()).not();
+        Formula operand = gOperator.operand.accept(this);
+        return GOperator.of(operand);
     }
 
     @Override
@@ -77,12 +77,11 @@ public class SolverSyntaxOperatorReplacer implements Visitor<Formula> {
 
     @Override
     public Formula visit(ROperator rOperator) {
-        // p R q" <-> q w (q && p) <-> (q U (q && p)) || G q
+        // p R q" -> "q W (p & q)
         Formula left = rOperator.left.accept(this);
         Formula right = rOperator.right.accept(this);
-        Formula uOperator = UOperator.of(right, Conjunction.of(right, left));
-        Formula gOperator = UOperator.of(BooleanConstant.TRUE, right.not()).not();
-        return Disjunction.of(uOperator, gOperator);
+        Formula wformula = WOperator.of(right, Conjunction.of(right, left));
+        return wformula.accept(this);
     }
 
     @Override
@@ -112,8 +111,7 @@ public class SolverSyntaxOperatorReplacer implements Visitor<Formula> {
     public Formula visit(WOperator wOperator) {
         Formula left = wOperator.left.accept(this);
         Formula right = wOperator.right.accept(this);
-        Formula gOperator = UOperator.of(BooleanConstant.TRUE, left.not()).not();
-        return Disjunction.of(gOperator, UOperator.of(left, right));
+        return Disjunction.of(GOperator.of(left), UOperator.of(left, right));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package helpers;
 
+import owl.ltl.Formula;
 import owl.ltl.LabelledFormula;
 
 import java.util.ArrayList;
@@ -26,6 +27,20 @@ public class SolverUtils {
 
     public static String toLambConvSyntax(String LTLFormula) {
         return replaceLTLConstructions(LTLFormula);
+    }
+
+    /** Separates the operators, without which aalta reads "Xp1" as a variable. */
+    public static String toSolverSyntax(Formula f) {
+        return replaceLTLConstructions(f.toString().replaceAll("([A-Z])", " $1 "));
+    }
+
+    /**
+     * Adapts a formula already in {@link #toSolverSyntax} form to BLACK, whose
+     * boolean constants are capitalised: a lowercase {@code false} would be
+     * read as a proposition named "false" and turn into a satisfiable atom.
+     */
+    public static String toBlackSyntax(String solverFormula) {
+        return solverFormula.replaceAll("\\btrue\\b", "True").replaceAll("\\bfalse\\b", "False");
     }
 
     public static String toSolverSyntax(LabelledFormula f) {

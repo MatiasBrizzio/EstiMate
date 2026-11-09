@@ -9,10 +9,10 @@ import java.util.LinkedList;
 
 public class CountMain {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void run(String[] args) throws IOException, InterruptedException {
         for (String arg : args) System.out.println(arg);
         if (args.length != 2)
-            throw new RuntimeException("CountMain.main: it takes the formula and the bound as input: " + args.length);
+            throw new RuntimeException("CountMain.run: it takes the formula and the bound as input: " + args.length);
         String ltl = args[0];
         int bound = Integer.parseInt(args[1]);
         TranslatorLTL2RE translatorLTLtoRE = new TranslatorLTL2RE();
